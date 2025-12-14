@@ -34,9 +34,6 @@ const SEARCH_KEYWORDS = [
   "雑学 解説",
   "歴史ミステリー",
   "世界の闇",
-  // 作業用・ながら聴き系
-  "作業用 解説",
-  "ながら聴き 解説",
 ];
 
 const buildSuccessMessage = (
