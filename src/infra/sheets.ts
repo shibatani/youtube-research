@@ -18,7 +18,10 @@ const getAuthClient = (): JWT => {
   if (fs.existsSync(credentialsPath)) {
     credentials = JSON.parse(fs.readFileSync(credentialsPath, "utf-8"));
   } else {
-    credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY || "{}");
+    credentials = {
+      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || "",
+      private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n") || "",
+    };
   }
 
   return new google.auth.JWT(credentials.client_email, undefined, credentials.private_key, [
