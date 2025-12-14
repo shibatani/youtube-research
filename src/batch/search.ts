@@ -47,6 +47,11 @@ const buildSuccessMessage = (channels: { name: string; channelId: string }[]): s
     ...channels.map(({ name, channelId }) => `• ${name}\n  ${buildChannelUrl(channelId)}`),
   ].join("\n");
 
+const MIN_SUBSCRIBERS = 100;
+const MIN_VIDEOS = 5;
+const MIN_TOTAL_VIEWS = 10000;
+const MIN_AVG_VIEWS_PER_VIDEO = 1000;
+
 const main = async () => {
   const keyword = sample(SEARCH_KEYWORDS)!;
   console.log(`🔍 検索キーワード: ${keyword}`);
@@ -80,15 +85,23 @@ const main = async () => {
   // 4. チャンネル情報取得（channels.list）
   const channelDataList = await getChannels({ channelIds: newChannelIds });
 
-  // 5. フィルタリング（登録者100人未満 or 動画5本以下を除外）
-  const MIN_SUBSCRIBERS = 100;
-  const MIN_VIDEOS = 5;
+  // 5. フィルタリング
   const filteredChannels = channelDataList.filter(({ statistics }) => {
     const subscriberCount = Number(statistics?.subscriberCount ?? 0);
     const videoCount = Number(statistics?.videoCount ?? 0);
-    return subscriberCount >= MIN_SUBSCRIBERS && videoCount >= MIN_VIDEOS;
+    const viewCount = Number(statistics?.viewCount ?? 0);
+    const avgViewsPerVideo = videoCount > 0 ? viewCount / videoCount : 0;
+
+    return (
+      subscriberCount >= MIN_SUBSCRIBERS &&
+      videoCount >= MIN_VIDEOS &&
+      viewCount >= MIN_TOTAL_VIEWS &&
+      avgViewsPerVideo >= MIN_AVG_VIEWS_PER_VIDEO
+    );
   });
-  console.log(`フィルタ後: ${filteredChannels.length}件（除外: ${channelDataList.length - filteredChannels.length}件）`);
+  console.log(
+    `フィルタ後: ${filteredChannels.length}件（除外: ${channelDataList.length - filteredChannels.length}件）`,
+  );
 
   // 6. DBに保存（channelテーブルにINSERT）
   const newChannels: ChannelInsertInput[] = filteredChannels.map(({ id, snippet }) => ({
