@@ -1,13 +1,13 @@
 import "dotenv/config";
 import { type ChannelInsertInput } from "../db/schema";
-import { channel } from "../db/repository";
-import { searchVideos, getChannels } from "../infra/youtube";
+import { channel, searchLog } from "../db/repository";
+import { searchVideos, getChannels, duration, searchOrder } from "../infra/youtube";
 import { buildChannelUrl } from "../lib/youtube";
 import { notifySlack } from "../infra/slack";
 import { isNotNullish } from "../lib/type-guard";
 import { difference, sample } from "lodash";
+import dayjs from "dayjs";
 
-/** 固定キーワードリスト */
 const SEARCH_KEYWORDS = [
   // 音声合成系
   "ゆっくり",
@@ -40,13 +40,29 @@ const SEARCH_KEYWORDS = [
   "ながら聴き 解説",
 ];
 
-/** 登録完了メッセージを生成 */
-const buildSuccessMessage = (channels: { name: string; channelId: string }[]): string =>
+const buildSuccessMessage = (
+  keyword: string,
+  channels: { name: string; channelId: string }[],
+): string =>
   [
+    `🔍 キーワード: ${keyword}`,
     `✅ ${channels.length}件のチャンネルを登録しました`,
     ...channels.map(({ name, channelId }) => `• ${name}\n  ${buildChannelUrl(channelId)}`),
   ].join("\n");
 
+const buildNoResultMessage = (keyword: string): string =>
+  `🔍 キーワード: ${keyword}\n📭 新規チャンネルは見つかりませんでした`;
+
+// ============================
+// 検索条件（可変）
+// ============================
+const videoDuration = duration.medium;
+const order = searchOrder.viewCount;
+const publishedAfter = dayjs().startOf("week");
+
+// ============================
+// フィルター条件（可変）
+// ============================
 const MIN_SUBSCRIBERS = 100;
 const MIN_VIDEOS = 5;
 const MIN_TOTAL_VIEWS = 10000;
@@ -56,20 +72,20 @@ const main = async () => {
   const keyword = sample(SEARCH_KEYWORDS)!;
   console.log(`🔍 検索キーワード: ${keyword}`);
 
-  // 1. YouTube search.list でキーワード検索
-  const searchResults = await searchVideos({
+  const { items: searchResults, totalResults } = await searchVideos({
     query: keyword,
+    videoDuration,
+    order,
+    publishedAfter,
   });
-  console.log(`検索結果: ${searchResults.length}件`);
+  console.log(`検索結果: ${searchResults.length}件 (総ヒット数: ${totalResults}件)`);
 
-  // 2. 結果からチャンネルID抽出（重複除去）
   const channelIds = [
     ...new Set(
       searchResults.map(({ snippet }) => snippet?.channelId).filter((id) => isNotNullish(id)),
     ),
   ];
 
-  // 3. 既にDBにあるチャンネルは除外
   const existingChannels = await channel.getByChannelIds(channelIds);
   const newChannelIds = difference(
     channelIds,
@@ -78,14 +94,35 @@ const main = async () => {
   console.log(`新規チャンネル数: ${newChannelIds.length}件`);
 
   if (newChannelIds.length === 0) {
-    console.log("✅ 新規チャンネルなし。探索を終了します。");
+    const message = buildNoResultMessage(keyword);
+    console.log(message);
+    await searchLog.insert({
+      hitVideoCount: searchResults.length,
+      hitTotalVideoCount: totalResults,
+      uniqueChannelCount: channelIds.length,
+      newChannelCount: newChannelIds.length,
+      keyword,
+      videoDuration,
+      order,
+      publishedAfter: publishedAfter.toISOString(),
+    });
+    await notifySlack(`[search] ${message}`);
     return;
   }
 
-  // 4. チャンネル情報取得（channels.list）
+  await searchLog.insert({
+    hitVideoCount: searchResults.length,
+    hitTotalVideoCount: totalResults,
+    uniqueChannelCount: channelIds.length,
+    newChannelCount: newChannelIds.length,
+    keyword,
+    videoDuration,
+    order,
+    publishedAfter: publishedAfter.toISOString(),
+  });
+
   const channelDataList = await getChannels({ channelIds: newChannelIds });
 
-  // 5. フィルタリング
   const filteredChannels = channelDataList.filter(({ statistics }) => {
     const subscriberCount = Number(statistics?.subscriberCount ?? 0);
     const videoCount = Number(statistics?.videoCount ?? 0);
@@ -103,20 +140,24 @@ const main = async () => {
     `フィルタ後: ${filteredChannels.length}件（除外: ${channelDataList.length - filteredChannels.length}件）`,
   );
 
-  // 6. DBに保存（channelテーブルにINSERT）
+  if (filteredChannels.length === 0) {
+    const message = buildNoResultMessage(keyword);
+    console.log(message);
+    await notifySlack(`[search] ${message}`);
+    return;
+  }
+
   const newChannels: ChannelInsertInput[] = filteredChannels.map(({ id, snippet }) => ({
     channelId: id!,
     name: snippet?.title ?? "不明",
     thumbnailUrl: snippet?.thumbnails?.default?.url ?? null,
   }));
 
-  if (newChannels.length > 0) {
-    await channel.bulkInsert(newChannels);
+  await channel.bulkInsert(newChannels);
 
-    const message = buildSuccessMessage(newChannels);
-    console.log(message);
-    await notifySlack(`[search] ${message}`);
-  }
+  const message = buildSuccessMessage(keyword, newChannels);
+  console.log(message);
+  await notifySlack(`[search] ${message}`);
 };
 
 main().catch(async (error) => {

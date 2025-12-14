@@ -65,6 +65,12 @@ export const getChannels = async ({ channelIds }: { channelIds: string[] }): Pro
   return results.flatMap(({ data }) => data.items ?? []);
 };
 
+/** 検索結果の返り値 */
+export type SearchVideosResult = {
+  items: SearchResult[];
+  totalResults: number;
+};
+
 /**
  * キーワードで動画を検索（100クォータ消費）
  * @param query - 検索キーワード
@@ -85,7 +91,7 @@ export const searchVideos = async ({
   videoDuration?: Duration;
   order?: SearchOrder;
   publishedAfter?: Dayjs;
-}): Promise<SearchResult[]> => {
+}): Promise<SearchVideosResult> => {
   const result = await youtube.search.list({
     part: ["snippet"],
     q: query,
@@ -95,7 +101,10 @@ export const searchVideos = async ({
     videoDuration,
     publishedAfter: publishedAfter?.toISOString(),
   });
-  return result.data.items ?? [];
+  return {
+    items: result.data.items ?? [],
+    totalResults: result.data.pageInfo?.totalResults ?? 0,
+  };
 };
 
 /** チャンネルIDからアップロードプレイリストIDを導出（UC... → UU...） */

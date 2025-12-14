@@ -30,24 +30,20 @@ const oneMonthAgo = dayjs().subtract(1, "month");
 
 /** チャンネル監視に必要なデータを一括取得 */
 const loadChannelMonitorData = async () => {
-  // DBから監視対象のチャンネル取得
   const activeChannels = await channel.getActive();
   console.log(`対象チャンネル数: ${activeChannels.length}件`);
 
   const activeChannelIds = activeChannels.map(({ channelId }) => channelId);
 
-  // 最新のチャンネル情報を取得
   const channels = await getChannels({ channelIds: activeChannelIds });
   console.log(`チャンネル情報取得: ${channels.length}件`);
 
-  // 最新のチャンネル動画情報を取得
   const playlistItemsResults = await pMap(
     activeChannelIds,
     (channelId) => getChannelVideos({ channelId }),
     { concurrency: 10 },
   );
 
-  // 直近1ヶ月の動画のみフィルタ
   const playlistItems = playlistItemsResults.flat().filter((item) => {
     const publishedAt = item.contentDetails?.videoPublishedAt;
     if (!publishedAt) return false;
@@ -55,7 +51,6 @@ const loadChannelMonitorData = async () => {
   });
   console.log(`直近1ヶ月の動画数: ${playlistItems.length}件`);
 
-  // 動画の詳細情報を取得
   const videos = await getVideos({
     videoIds: playlistItems
       .map(({ contentDetails }) => contentDetails?.videoId)
@@ -63,7 +58,6 @@ const loadChannelMonitorData = async () => {
   });
   console.log(`動画詳細取得: ${videos.length}件`);
 
-  // DB前日データ取得
   console.log("DB履歴データ取得中...");
   const dbChannelIds = activeChannels.map((c) => c.id);
 
@@ -97,7 +91,6 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
     channelIdToViewCountMap,
   } = data;
 
-  // チャンネルごとの指標を計算
   const channelMetrics = activeChannels.flatMap((activeChannel) => {
     const channelData = channelsMap.get(activeChannel.channelId);
     if (!channelData) {
@@ -248,7 +241,6 @@ const main = async () => {
   const { subscriberInserts, videoCountInserts, viewCountInserts, sheetRows } =
     buildChannelMonitorParams(monitorData);
 
-  // 一括INSERT
   console.log("DBに保存中...");
   await Promise.all([
     subscriberCount.bulkInsert(subscriberInserts),
@@ -257,7 +249,6 @@ const main = async () => {
   ]);
   console.log(`✅DB保存完了: ${subscriberInserts.length}件`);
 
-  // スプシ出力
   console.log("スプレッドシートに出力中...");
   const sheetName = "シート1";
   await clearSheet({ range: `${sheetName}!A:Z` });
@@ -267,7 +258,6 @@ const main = async () => {
   });
   console.log(`✅スプシ出力完了: ${sheetRows.length}行`);
 
-  // Slack通知
   await notifySlack(`[monitor] 日次監視完了\n• 対象チャンネル: ${monitorData.activeChannels.length}件`);
 };
 
