@@ -26,6 +26,3 @@ npm-debug.log*
 *.json
 !package.json
 !tsconfig.json
-
-# npm lock file (using yarn)
-package-lock.json
