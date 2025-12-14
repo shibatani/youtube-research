@@ -25,5 +25,7 @@ npm-debug.log*
 # Service account keys
 *.json
 !package.json
-!package-lock.json
 !tsconfig.json
+
+# npm lock file (using yarn)
+package-lock.json
