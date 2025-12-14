@@ -15,22 +15,20 @@ const SEARCH_KEYWORDS = [
   "ずんだもん 解説",
   "AI 音声 解説",
   // まとめ・反応系
-  "2chまとめ",
-  "5chまとめ",
-  "海外の反応",
-  "コメント欄の反応",
+  "2ch",
+  "5ch",
+  "海外 反応",
+  "コメント欄 反応",
   "反応集",
   // 日本賞賛・感動系
   "日本 海外の反応",
   "日本 感動",
   "日本 賞賛",
-  "スカッとする話",
-  "感動する話",
-  "いい話",
+  "スカッと",
+  "感動",
   // ホラー・怪談系
   "怪談朗読",
   "都市伝説",
-  "未解決事件",
   "作業用怪談",
   // 知識・解説系
   "雑学 解説",
@@ -82,8 +80,18 @@ const main = async () => {
   // 4. チャンネル情報取得（channels.list）
   const channelDataList = await getChannels({ channelIds: newChannelIds });
 
-  // 5. DBに保存（channelテーブルにINSERT）
-  const newChannels: ChannelInsertInput[] = channelDataList.map(({ id, snippet }) => ({
+  // 5. フィルタリング（登録者100人未満 or 動画5本以下を除外）
+  const MIN_SUBSCRIBERS = 100;
+  const MIN_VIDEOS = 5;
+  const filteredChannels = channelDataList.filter(({ statistics }) => {
+    const subscriberCount = Number(statistics?.subscriberCount ?? 0);
+    const videoCount = Number(statistics?.videoCount ?? 0);
+    return subscriberCount >= MIN_SUBSCRIBERS && videoCount >= MIN_VIDEOS;
+  });
+  console.log(`フィルタ後: ${filteredChannels.length}件（除外: ${channelDataList.length - filteredChannels.length}件）`);
+
+  // 6. DBに保存（channelテーブルにINSERT）
+  const newChannels: ChannelInsertInput[] = filteredChannels.map(({ id, snippet }) => ({
     channelId: id!,
     name: snippet?.title ?? "不明",
     thumbnailUrl: snippet?.thumbnails?.default?.url ?? null,
