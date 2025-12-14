@@ -1,0 +1,278 @@
+import "dotenv/config";
+import "../config/dayjs";
+import dayjs from "dayjs";
+import { sumBy } from "lodash";
+import pMap from "p-map";
+import {
+  type DailyChannelSubscriberCountInsertInput,
+  type DailyChannelMonthlyVideoCountInsertInput,
+  type DailyChannelMonthlyViewCountInsertInput,
+} from "../db/schema";
+import { channel, subscriberCount, videoCount, viewCount } from "../db/repository";
+import { getChannels, getChannelVideos, getVideos } from "../infra/youtube";
+import { clearSheet, updateSheet } from "../infra/sheets";
+import { notifySlack } from "../infra/slack";
+import { keyByMap, groupByMap } from "../lib/map";
+import { dateObjectToDateString } from "../lib/date-string";
+import { isNotNull, isNotNullish } from "../lib/type-guard";
+import { buildChannelUrl } from "../lib/youtube";
+
+/** 秒を「MM:SS」形式に変換 */
+const formatDuration = (seconds: number): string => {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+};
+
+const today = dateObjectToDateString(dayjs());
+const yesterday = dateObjectToDateString(dayjs().subtract(1, "day"));
+const oneMonthAgo = dayjs().subtract(1, "month");
+
+/** チャンネル監視に必要なデータを一括取得 */
+const loadChannelMonitorData = async () => {
+  // DBから監視対象のチャンネル取得
+  const activeChannels = await channel.getActive();
+  console.log(`対象チャンネル数: ${activeChannels.length}件`);
+
+  const activeChannelIds = activeChannels.map(({ channelId }) => channelId);
+
+  // 最新のチャンネル情報を取得
+  const channels = await getChannels({ channelIds: activeChannelIds });
+  console.log(`チャンネル情報取得: ${channels.length}件`);
+
+  // 最新のチャンネル動画情報を取得
+  const playlistItemsResults = await pMap(
+    activeChannelIds,
+    (channelId) => getChannelVideos({ channelId }),
+    { concurrency: 10 },
+  );
+
+  // 直近1ヶ月の動画のみフィルタ
+  const playlistItems = playlistItemsResults.flat().filter((item) => {
+    const publishedAt = item.contentDetails?.videoPublishedAt;
+    if (!publishedAt) return false;
+    return dayjs(publishedAt).isAfter(oneMonthAgo);
+  });
+  console.log(`直近1ヶ月の動画数: ${playlistItems.length}件`);
+
+  // 動画の詳細情報を取得
+  const videos = await getVideos({
+    videoIds: playlistItems
+      .map(({ contentDetails }) => contentDetails?.videoId)
+      .filter(isNotNullish),
+  });
+  console.log(`動画詳細取得: ${videos.length}件`);
+
+  // DB前日データ取得
+  console.log("DB履歴データ取得中...");
+  const dbChannelIds = activeChannels.map((c) => c.id);
+
+  const [subscribers, videoCounts, viewCounts] = await Promise.all([
+    subscriberCount.getByChannelIdsAndDate(dbChannelIds, yesterday),
+    videoCount.getByChannelIdsAndDate(dbChannelIds, yesterday),
+    viewCount.getByChannelIdsAndDate(dbChannelIds, yesterday),
+  ]);
+
+  return {
+    activeChannels,
+    playlistItems,
+    channelsMap: keyByMap(channels, ({ id }) => id!),
+    videosMap: keyByMap(videos, ({ id }) => id!),
+    channelIdToPlaylistItemsMap: groupByMap(playlistItems, ({ snippet }) => snippet?.channelId!),
+    channelIdToSubscriberMap: keyByMap(subscribers, ({ channelId }) => channelId),
+    channelIdToVideoCountMap: keyByMap(videoCounts, ({ channelId }) => channelId),
+    channelIdToViewCountMap: keyByMap(viewCounts, ({ channelId }) => channelId),
+  };
+};
+
+/** チャンネル監視データからDB・スプシ用パラメータを生成 */
+const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMonitorData>>) => {
+  const {
+    activeChannels,
+    channelsMap,
+    videosMap,
+    channelIdToPlaylistItemsMap,
+    channelIdToSubscriberMap,
+    channelIdToVideoCountMap,
+    channelIdToViewCountMap,
+  } = data;
+
+  // チャンネルごとの指標を計算
+  const channelMetrics = activeChannels.flatMap((activeChannel) => {
+    const channelData = channelsMap.get(activeChannel.channelId);
+    if (!channelData) {
+      console.warn(`チャンネルデータなし: ${activeChannel.channelId}`);
+      return [];
+    }
+
+    const subscriberCount = parseInt(channelData.statistics?.subscriberCount ?? "0", 10);
+
+    // 直近1ヶ月の動画投稿本数
+    const videos = channelIdToPlaylistItemsMap.get(activeChannel.channelId) ?? [];
+    const videoCount = videos.length;
+
+    // 動画詳細から統計情報取得
+    const videoDetails = videos
+      .map(({ contentDetails }) => videosMap.get(contentDetails?.videoId!))
+      .filter((videoDetail) => isNotNullish(videoDetail));
+
+    // 直近1ヶ月の再生数合計
+    const monthlyViewCount = sumBy(videoDetails, ({ statistics }) =>
+      parseInt(statistics?.viewCount ?? "0", 10),
+    );
+
+    // 平均動画長さ（秒）
+    const avgDurationSeconds =
+      videoDetails.length > 0
+        ? sumBy(videoDetails, ({ contentDetails }) =>
+            dayjs.duration(contentDetails?.duration ?? "PT0S").asSeconds(),
+          ) / videoDetails.length
+        : 0;
+
+    // 平均高評価率
+    const avgLikeRate =
+      videoDetails.length > 0
+        ? sumBy(videoDetails, ({ statistics }) => {
+            const views = parseInt(statistics?.viewCount ?? "0", 10);
+            const likes = parseInt(statistics?.likeCount ?? "0", 10);
+            return views > 0 ? (likes / views) * 100 : 0;
+          }) / videoDetails.length
+        : 0;
+
+    // 平均再生数
+    const avgViewCount = videoCount > 0 ? monthlyViewCount / videoCount : 0;
+
+    // 拡散率
+    const spreadRate = subscriberCount > 0 ? (monthlyViewCount / subscriberCount) * 100 : 0;
+
+    // 前日比計算
+    const yesterdayVideoCount = channelIdToVideoCountMap.get(activeChannel.id);
+    const yesterdayViewCount = channelIdToViewCountMap.get(activeChannel.id);
+    const yesterdaySubscriberCount = channelIdToSubscriberMap.get(activeChannel.id);
+
+    const yesterdayAvgViewCount =
+      yesterdayVideoCount && yesterdayViewCount && yesterdayVideoCount.count > 0
+        ? yesterdayViewCount.count / yesterdayVideoCount.count
+        : null;
+
+    const yesterdaySpreadRate =
+      yesterdayViewCount && yesterdaySubscriberCount && yesterdaySubscriberCount.count > 0
+        ? (yesterdayViewCount.count / yesterdaySubscriberCount.count) * 100
+        : null;
+
+    const avgViewCountDiff = isNotNull(yesterdayAvgViewCount)
+      ? avgViewCount - yesterdayAvgViewCount
+      : null;
+    const spreadRateDiff = isNotNull(yesterdaySpreadRate) ? spreadRate - yesterdaySpreadRate : null;
+
+    return [
+      {
+        channel: activeChannel,
+        subscriberCount,
+        videoCount,
+        monthlyViewCount,
+        avgDurationSeconds,
+        avgLikeRate,
+        avgViewCount,
+        spreadRate,
+        avgViewCountDiff,
+        spreadRateDiff,
+      },
+    ];
+  });
+
+  // DB INSERT用データ
+  const subscriberInserts: DailyChannelSubscriberCountInsertInput[] = channelMetrics.map(
+    ({ channel, subscriberCount }) => ({
+      channelId: channel.id,
+      businessDate: today,
+      count: subscriberCount,
+    }),
+  );
+
+  const videoCountInserts: DailyChannelMonthlyVideoCountInsertInput[] = channelMetrics.map(
+    ({ channel, videoCount }) => ({
+      channelId: channel.id,
+      businessDate: today,
+      count: videoCount,
+    }),
+  );
+
+  const viewCountInserts: DailyChannelMonthlyViewCountInsertInput[] = channelMetrics.map(
+    ({ channel, monthlyViewCount }) => ({
+      channelId: channel.id,
+      businessDate: today,
+      count: monthlyViewCount,
+    }),
+  );
+
+  // スプシ用データ
+  const sheetRows: (string | number)[][] = [
+    [
+      "チャンネルアイコン",
+      "チャンネル名",
+      "チャンネルリンク",
+      "登録者数",
+      "直近1ヶ月投稿本数",
+      "平均動画長さ",
+      "平均高評価率(%)",
+      "平均再生数",
+      "平均再生数前日比",
+      "拡散率(%)",
+      "拡散率前日比",
+    ],
+    ...channelMetrics.map((metrics) => [
+      `=IMAGE("${metrics.channel.thumbnailUrl ?? ""}")`,
+      metrics.channel.name,
+      buildChannelUrl(metrics.channel.channelId),
+      metrics.subscriberCount,
+      metrics.videoCount,
+      formatDuration(metrics.avgDurationSeconds),
+      Math.round(metrics.avgLikeRate * 100) / 100,
+      Math.round(metrics.avgViewCount),
+      isNotNull(metrics.avgViewCountDiff) ? Math.round(metrics.avgViewCountDiff) : "-",
+      Math.round(metrics.spreadRate * 100) / 100,
+      isNotNull(metrics.spreadRateDiff) ? Math.round(metrics.spreadRateDiff * 100) / 100 : "-",
+    ]),
+  ];
+
+  return { subscriberInserts, videoCountInserts, viewCountInserts, sheetRows };
+};
+
+const main = async () => {
+  console.log(`📅 日次監視開始: ${today}`);
+
+  const monitorData = await loadChannelMonitorData();
+
+  console.log("指標計算中...");
+  const { subscriberInserts, videoCountInserts, viewCountInserts, sheetRows } =
+    buildChannelMonitorParams(monitorData);
+
+  // 一括INSERT
+  console.log("DBに保存中...");
+  await Promise.all([
+    subscriberCount.bulkInsert(subscriberInserts),
+    videoCount.bulkInsert(videoCountInserts),
+    viewCount.bulkInsert(viewCountInserts),
+  ]);
+  console.log(`✅DB保存完了: ${subscriberInserts.length}件`);
+
+  // スプシ出力
+  console.log("スプレッドシートに出力中...");
+  const sheetName = "シート1";
+  await clearSheet({ range: `${sheetName}!A:Z` });
+  await updateSheet({
+    range: `${sheetName}!A1`,
+    values: sheetRows,
+  });
+  console.log(`✅スプシ出力完了: ${sheetRows.length}行`);
+
+  // Slack通知
+  await notifySlack(`[monitor] 日次監視完了\n• 対象チャンネル: ${monitorData.activeChannels.length}件`);
+};
+
+main().catch(async (error) => {
+  console.error(error);
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  await notifySlack(`[monitor] エラー発生\n\`\`\`${errorMessage}\`\`\``);
+});

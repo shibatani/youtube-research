@@ -1,0 +1,44 @@
+{
+  "name": "youtube-research",
+  "version": "1.0.0",
+  "description": "YouTube data research tool with Google Sheets integration",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "batch:search": "tsx src/batch/search.ts",
+    "batch:monitor": "tsx src/batch/monitor.ts"
+  },
+  "keywords": [
+    "youtube",
+    "research",
+    "google-sheets"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "dayjs": "^1.11.19",
+    "dotenv": "^16.3.1",
+    "drizzle-orm": "^0.45.0",
+    "googleapis": "^129.0.0",
+    "lodash": "^4.17.21",
+    "p-map": "^7.0.4",
+    "rss-parser": "^3.13.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "drizzle-kit": "^0.31.8",
+    "prettier": "^3.7.4",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.2"
+  }
+}
