@@ -12,7 +12,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "batch:search": "tsx src/batch/search.ts",
+    "batch:search": "tsx src/batch/search/index.ts",
     "batch:monitor": "tsx src/batch/monitor.ts"
   },
   "keywords": [

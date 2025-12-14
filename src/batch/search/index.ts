@@ -1,40 +1,13 @@
 import "dotenv/config";
-import { type ChannelInsertInput } from "../db/schema";
-import { channel, searchLog } from "../db/repository";
-import { searchVideos, getChannels, duration, searchOrder } from "../infra/youtube";
-import { buildChannelUrl } from "../lib/youtube";
-import { notifySlack } from "../infra/slack";
-import { isNotNullish } from "../lib/type-guard";
+import { type ChannelInsertInput } from "../../db/schema";
+import { channel, searchLog } from "../../db/repository";
+import { searchVideos, getChannels, duration, searchOrder } from "../../infra/youtube";
+import { buildChannelUrl } from "../../lib/youtube";
+import { notifySlack } from "../../infra/slack";
+import { isNotNullish } from "../../lib/type-guard";
 import { difference, sample } from "lodash";
 import dayjs from "dayjs";
-
-const SEARCH_KEYWORDS = [
-  // 音声合成系
-  "ゆっくり",
-  "ゆっくり 解説",
-  "ボイスロイド 解説",
-  "ずんだもん",
-  "ずんだもん 解説",
-  // まとめ・反応系
-  "2ch",
-  "5ch",
-  "海外 反応",
-  "コメント欄 反応",
-  "反応集",
-  // 日本賞賛・感動系
-  "日本 海外の反応",
-  "日本 感動",
-  "日本 賞賛",
-  "スカッと",
-  "感動",
-  // ホラー・怪談系
-  "都市伝説",
-  "作業用 怪談",
-  // 知識・解説系
-  "雑学 解説",
-  "歴史ミステリー",
-  "世界の闇",
-];
+import { SEARCH_KEYWORDS } from "./const";
 
 const buildSuccessMessage = (
   keyword: string,
@@ -49,15 +22,30 @@ const buildSuccessMessage = (
 const buildNoResultMessage = (keyword: string): string =>
   `🔍 キーワード: ${keyword}\n📭 新規チャンネルは見つかりませんでした`;
 
+/** 検索ログを保存 */
+const saveSearchLog = async (params: {
+  hitVideoCount: number;
+  hitTotalVideoCount: number;
+  uniqueChannelCount: number;
+  newChannelCount: number;
+  keyword: string;
+}) =>
+  searchLog.insert({
+    ...params,
+    videoDuration,
+    order,
+    publishedAfter: publishedAfter.toISOString(),
+  });
+
 // ============================
-// 検索条件（可変）
+// 検索条件
 // ============================
 const videoDuration = duration.medium;
 const order = searchOrder.viewCount;
 const publishedAfter = dayjs().startOf("week");
 
 // ============================
-// フィルター条件（可変）
+// フィルター条件
 // ============================
 const MIN_SUBSCRIBERS = 100;
 const MIN_VIDEOS = 5;
@@ -89,33 +77,23 @@ const main = async () => {
   );
   console.log(`新規チャンネル数: ${newChannelIds.length}件`);
 
-  if (newChannelIds.length === 0) {
-    const message = buildNoResultMessage(keyword);
-    console.log(message);
-    await searchLog.insert({
-      hitVideoCount: searchResults.length,
-      hitTotalVideoCount: totalResults,
-      uniqueChannelCount: channelIds.length,
-      newChannelCount: newChannelIds.length,
-      keyword,
-      videoDuration,
-      order,
-      publishedAfter: publishedAfter.toISOString(),
-    });
-    await notifySlack(`[search] ${message}`);
-    return;
-  }
-
-  await searchLog.insert({
+  const logParams = {
     hitVideoCount: searchResults.length,
     hitTotalVideoCount: totalResults,
     uniqueChannelCount: channelIds.length,
     newChannelCount: newChannelIds.length,
     keyword,
-    videoDuration,
-    order,
-    publishedAfter: publishedAfter.toISOString(),
-  });
+  };
+
+  if (newChannelIds.length === 0) {
+    const message = buildNoResultMessage(keyword);
+    console.log(message);
+    await saveSearchLog(logParams);
+    await notifySlack(`[search] ${message}`);
+    return;
+  }
+
+  await saveSearchLog(logParams);
 
   const channelDataList = await getChannels({ channelIds: newChannelIds });
 
