@@ -42,7 +42,7 @@ const saveSearchLog = async (params: {
 // ============================
 const videoDuration = duration.medium;
 const order = searchOrder.viewCount;
-const publishedAfter = dayjs().subtract(1, "week");
+const publishedAfter = dayjs().subtract(1, "month");
 
 // ============================
 // フィルター条件
