@@ -158,6 +158,11 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       : null;
     const spreadRateDiff = isNotNull(yesterdaySpreadRate) ? spreadRate - yesterdaySpreadRate : null;
 
+    const subscriberGrowthRate =
+      yesterdaySubscriberCount && yesterdaySubscriberCount.count > 0
+        ? ((subscriberCount - yesterdaySubscriberCount.count) / yesterdaySubscriberCount.count) * 100
+        : null;
+
     return [
       {
         channel: activeChannel,
@@ -170,6 +175,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
         spreadRate,
         avgViewCountDiff,
         spreadRateDiff,
+        subscriberGrowthRate,
       },
     ];
   });
@@ -206,6 +212,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       "チャンネル名",
       "チャンネルリンク",
       "登録者数",
+      "登録者前日比増加率(%)",
       "直近1ヶ月投稿本数",
       "平均動画長さ",
       "平均高評価率(%)",
@@ -219,6 +226,9 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       metrics.channel.name,
       buildChannelUrl(metrics.channel.channelId),
       metrics.subscriberCount,
+      isNotNull(metrics.subscriberGrowthRate)
+        ? Math.round(metrics.subscriberGrowthRate * 1000) / 1000
+        : "-",
       metrics.videoCount,
       formatDuration(metrics.avgDurationSeconds),
       Math.round(metrics.avgLikeRate * 100) / 100,
