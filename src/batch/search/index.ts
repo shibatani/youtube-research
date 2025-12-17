@@ -8,6 +8,21 @@ import { isNotNullish } from "../../lib/type-guard";
 import { difference, sample } from "lodash";
 import dayjs from "dayjs";
 import { SEARCH_KEYWORDS } from "./const";
+import { filterChannels } from "./filter";
+
+const saveSearchLog = async (params: {
+  hitVideoCount: number;
+  hitTotalVideoCount: number;
+  uniqueChannelCount: number;
+  newChannelCount: number;
+  keyword: string;
+}) =>
+  await searchLog.insert({
+    ...params,
+    videoDuration,
+    order,
+    publishedAfter: publishedAfter.toISOString(),
+  });
 
 const buildSuccessMessage = (
   keyword: string,
@@ -22,35 +37,12 @@ const buildSuccessMessage = (
 const buildNoResultMessage = (keyword: string): string =>
   `🔍 キーワード: ${keyword}\n📭 新規チャンネルは見つかりませんでした`;
 
-/** 検索ログを保存 */
-const saveSearchLog = async (params: {
-  hitVideoCount: number;
-  hitTotalVideoCount: number;
-  uniqueChannelCount: number;
-  newChannelCount: number;
-  keyword: string;
-}) =>
-  searchLog.insert({
-    ...params,
-    videoDuration,
-    order,
-    publishedAfter: publishedAfter.toISOString(),
-  });
-
 // ============================
 // 検索条件
 // ============================
 const videoDuration = duration.medium;
 const order = searchOrder.viewCount;
 const publishedAfter = dayjs().subtract(1, "month");
-
-// ============================
-// フィルター条件
-// ============================
-const MIN_SUBSCRIBERS = 100;
-const MIN_VIDEOS = 5;
-const MIN_TOTAL_VIEWS = 10000;
-const MIN_AVG_VIEWS_PER_VIDEO = 1000;
 
 const main = async () => {
   const keyword = sample(SEARCH_KEYWORDS)!;
@@ -97,19 +89,7 @@ const main = async () => {
 
   const channelDataList = await getChannels({ channelIds: newChannelIds });
 
-  const filteredChannels = channelDataList.filter(({ statistics }) => {
-    const subscriberCount = Number(statistics?.subscriberCount ?? 0);
-    const videoCount = Number(statistics?.videoCount ?? 0);
-    const viewCount = Number(statistics?.viewCount ?? 0);
-    const avgViewsPerVideo = videoCount > 0 ? viewCount / videoCount : 0;
-
-    return (
-      subscriberCount >= MIN_SUBSCRIBERS &&
-      videoCount >= MIN_VIDEOS &&
-      viewCount >= MIN_TOTAL_VIEWS &&
-      avgViewsPerVideo >= MIN_AVG_VIEWS_PER_VIDEO
-    );
-  });
+  const filteredChannels = filterChannels(channelDataList);
   console.log(
     `フィルタ後: ${filteredChannels.length}件（除外: ${channelDataList.length - filteredChannels.length}件）`,
   );
