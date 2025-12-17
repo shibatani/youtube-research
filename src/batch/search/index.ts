@@ -24,17 +24,20 @@ const saveSearchLog = async (params: {
     publishedAfter: publishedAfter.toISOString(),
   });
 
-const buildSuccessMessage = (
-  keyword: string,
-  channels: { name: string; channelId: string }[],
-): string =>
+const buildSuccessMessage = ({
+  keyword,
+  channels,
+}: {
+  keyword: string;
+  channels: { name: string; channelId: string }[];
+}): string =>
   [
     `🔍 キーワード: ${keyword}`,
     `✅ ${channels.length}件のチャンネルを登録しました`,
     ...channels.map(({ name, channelId }) => `• ${name}\n  ${buildChannelUrl(channelId)}`),
   ].join("\n");
 
-const buildNoResultMessage = (keyword: string): string =>
+const buildNoResultMessage = ({ keyword }: { keyword: string }): string =>
   `🔍 キーワード: ${keyword}\n📭 新規チャンネルは見つかりませんでした`;
 
 // ============================
@@ -78,7 +81,7 @@ const main = async () => {
   };
 
   if (newChannelIds.length === 0) {
-    const message = buildNoResultMessage(keyword);
+    const message = buildNoResultMessage({ keyword });
     console.log(message);
     await saveSearchLog(logParams);
     await notifySlack(`[search] ${message}`);
@@ -89,13 +92,13 @@ const main = async () => {
 
   const channelDataList = await getChannels({ channelIds: newChannelIds });
 
-  const filteredChannels = filterChannels(channelDataList);
+  const filteredChannels = filterChannels({ channels: channelDataList });
   console.log(
     `フィルタ後: ${filteredChannels.length}件（除外: ${channelDataList.length - filteredChannels.length}件）`,
   );
 
   if (filteredChannels.length === 0) {
-    const message = buildNoResultMessage(keyword);
+    const message = buildNoResultMessage({ keyword });
     console.log(message);
     await notifySlack(`[search] ${message}`);
     return;
@@ -109,7 +112,7 @@ const main = async () => {
 
   await channel.bulkInsert(newChannels);
 
-  const message = buildSuccessMessage(keyword, newChannels);
+  const message = buildSuccessMessage({ keyword, channels: newChannels });
   console.log(message);
   await notifySlack(`[search] ${message}`);
 };
