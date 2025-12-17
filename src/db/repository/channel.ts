@@ -38,15 +38,19 @@ export const bulkInsert = async (data: ChannelInsertInput[]): Promise<void> => {
 };
 
 /**
- * チャンネルの isActive を更新
+ * 複数チャンネルの isActive を一括更新
  */
-export const updateActiveStatus = async (
-  id: string,
-  isActive: boolean
-): Promise<void> => {
+export const bulkUpdateActiveStatus = async ({
+  ids,
+  isActive,
+}: {
+  ids: string[];
+  isActive: boolean;
+}): Promise<void> => {
+  if (ids.length === 0) return;
   await db
     .update(channel)
     .set({ isActive })
-    .where(eq(channel.id, id));
+    .where(inArray(channel.id, ids));
 };
 
