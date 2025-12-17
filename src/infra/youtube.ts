@@ -3,6 +3,7 @@ import { chunk } from "lodash";
 import pMap from "p-map";
 import dayjs, { Dayjs } from "dayjs";
 import Parser from "rss-parser";
+import { notifySlack } from "./slack";
 
 const youtube = google.youtube({
   version: "v3",
@@ -119,10 +120,20 @@ export const getChannelVideos = async ({
   channelId: string;
   maxResults?: number;
 }): Promise<PlaylistItem[]> => {
-  const result = await youtube.playlistItems.list({
-    part: ["snippet", "contentDetails"],
-    playlistId: getUploadsPlaylistId({ channelId }),
-    maxResults,
-  });
-  return result.data.items ?? [];
+  try {
+    const result = await youtube.playlistItems.list({
+      part: ["snippet", "contentDetails"],
+      playlistId: getUploadsPlaylistId({ channelId }),
+      maxResults,
+    });
+    return result.data.items ?? [];
+  } catch (e) {
+    // チャンネル削除・BAN・アップロード非公開の場合にエラーになるためハンドリング
+    const message = e instanceof Error ? e.message : String(e);
+    console.warn(`動画取得失敗 (${channelId}): ${message}`);
+    await notifySlack(
+      `[getChannelVideos] 動画取得失敗\n• channelId: ${channelId}\n• error: ${message}`,
+    );
+    return [];
+  }
 };

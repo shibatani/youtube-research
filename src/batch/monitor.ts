@@ -59,7 +59,7 @@ const loadChannelMonitorData = async () => {
   console.log(`動画詳細取得: ${videos.length}件`);
 
   console.log("DB履歴データ取得中...");
-  const dbChannelIds = activeChannels.map((c) => c.id);
+  const dbChannelIds = activeChannels.map(({ id }) => id);
 
   const [subscribers, videoCounts, viewCounts] = await Promise.all([
     subscriberCount.getByChannelIdsAndDate(dbChannelIds, yesterday),
