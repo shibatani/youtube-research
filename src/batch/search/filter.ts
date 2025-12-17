@@ -10,7 +10,7 @@ const MIN_TOTAL_VIEWS = 10000;
 const MIN_AVG_VIEWS_PER_VIDEO = 1000;
 
 const containsExcludeKeyword = (text: string | null | undefined): boolean =>
-  EXCLUDE_KEYWORDS.some((kw) => text?.includes(kw) ?? false);
+  EXCLUDE_KEYWORDS.some((keyword) => text?.includes(keyword) ?? false);
 
 export const filterChannels = (channels: YouTubeChannel[]): YouTubeChannel[] =>
   channels.filter(({ snippet, statistics }) => {
