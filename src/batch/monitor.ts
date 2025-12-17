@@ -167,6 +167,9 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
         ? ((subscriberCount - yesterdaySubscriberCount.count) / yesterdaySubscriberCount.count) * 100
         : null;
 
+    // 月収予想（円）
+    const estimatedMonthlyRevenue = videoCount * avgViewCount * 0.3;
+
     return [
       {
         channel: activeChannel,
@@ -180,6 +183,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
         avgViewCountDiff,
         spreadRateDiff,
         subscriberGrowthRate,
+        estimatedMonthlyRevenue,
       },
     ];
   });
@@ -224,6 +228,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       "平均再生数前日比(%)",
       "拡散率",
       "拡散率前日比(%)",
+      "月収予想(円)",
     ],
     ...channelMetrics.map((metrics) => [
       `=IMAGE("${metrics.channel.thumbnailUrl ?? ""}")`,
@@ -240,6 +245,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       isNotNull(metrics.avgViewCountDiff) ? Math.round(metrics.avgViewCountDiff) : "-",
       Math.round(metrics.spreadRate * 100) / 100,
       isNotNull(metrics.spreadRateDiff) ? Math.round(metrics.spreadRateDiff * 100) / 100 : "-",
+      Math.round(metrics.estimatedMonthlyRevenue),
     ]),
   ];
 
