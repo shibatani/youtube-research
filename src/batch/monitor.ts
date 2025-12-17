@@ -260,6 +260,15 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
 const main = async () => {
   console.log(`📅 日次監視開始: ${today}`);
 
+  // NOTE: 本来はmonitor実行ログテーブルで管理すべきだが、
+  // 暫定的に積み上げデータの存在有無で重複実行を判定する
+  const existingData = await subscriberCount.getOneByDate(today);
+  if (existingData) {
+    console.log(`⏭️ ${today}のデータは既に存在するためスキップします`);
+    await notifySlack(`[monitor] ${today}のデータは既に存在するためスキップしました`);
+    return;
+  }
+
   const monitorData = await loadChannelMonitorData();
 
   console.log("指標計算中...");

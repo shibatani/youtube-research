@@ -30,6 +30,20 @@ export const getByDate = async (
 };
 
 /**
+ * 特定日のデータを1件取得（存在確認用）
+ */
+export const getOneByDate = async (
+  businessDate: DateString
+): Promise<DailyChannelSubscriberCount | null> => {
+  const result = await db
+    .select()
+    .from(dailyChannelSubscriberCount)
+    .where(eq(dailyChannelSubscriberCount.businessDate, businessDate))
+    .limit(1);
+  return result[0] ?? null;
+};
+
+/**
  * 複数チャンネルの特定日のデータを取得
  */
 export const getByChannelIdsAndDate = async (
