@@ -136,7 +136,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
     const avgViewCount = videoCount > 0 ? monthlyViewCount / videoCount : 0;
 
     // 拡散率
-    const spreadRate = subscriberCount > 0 ? (monthlyViewCount / subscriberCount) * 100 : 0;
+    const spreadRate = subscriberCount > 0 ? monthlyViewCount / subscriberCount : 0;
 
     // 前日比計算
     const yesterdayVideoCount = channelIdToVideoCountMap.get(activeChannel.id);
@@ -150,13 +150,17 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
 
     const yesterdaySpreadRate =
       yesterdayViewCount && yesterdaySubscriberCount && yesterdaySubscriberCount.count > 0
-        ? (yesterdayViewCount.count / yesterdaySubscriberCount.count) * 100
+        ? yesterdayViewCount.count / yesterdaySubscriberCount.count
         : null;
 
-    const avgViewCountDiff = isNotNull(yesterdayAvgViewCount)
-      ? avgViewCount - yesterdayAvgViewCount
-      : null;
-    const spreadRateDiff = isNotNull(yesterdaySpreadRate) ? spreadRate - yesterdaySpreadRate : null;
+    const avgViewCountDiff =
+      isNotNull(yesterdayAvgViewCount) && yesterdayAvgViewCount > 0
+        ? ((avgViewCount - yesterdayAvgViewCount) / yesterdayAvgViewCount) * 100
+        : null;
+    const spreadRateDiff =
+      isNotNull(yesterdaySpreadRate) && yesterdaySpreadRate > 0
+        ? ((spreadRate - yesterdaySpreadRate) / yesterdaySpreadRate) * 100
+        : null;
 
     const subscriberGrowthRate =
       yesterdaySubscriberCount && yesterdaySubscriberCount.count > 0
@@ -217,9 +221,9 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       "平均動画長さ",
       "平均高評価率(%)",
       "平均再生数",
-      "平均再生数前日比",
-      "拡散率(%)",
-      "拡散率前日比",
+      "平均再生数前日比(%)",
+      "拡散率",
+      "拡散率前日比(%)",
     ],
     ...channelMetrics.map((metrics) => [
       `=IMAGE("${metrics.channel.thumbnailUrl ?? ""}")`,
