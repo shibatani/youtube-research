@@ -99,6 +99,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
     }
 
     const subscriberCount = parseInt(channelData.statistics?.subscriberCount ?? "0", 10);
+    const channelPublishedAt = channelData.snippet?.publishedAt ?? null;
 
     // 直近1ヶ月の動画投稿本数
     const videos = channelIdToPlaylistItemsMap.get(activeChannel.channelId) ?? [];
@@ -164,7 +165,8 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
 
     const subscriberGrowthRate =
       yesterdaySubscriberCount && yesterdaySubscriberCount.count > 0
-        ? ((subscriberCount - yesterdaySubscriberCount.count) / yesterdaySubscriberCount.count) * 100
+        ? ((subscriberCount - yesterdaySubscriberCount.count) / yesterdaySubscriberCount.count) *
+          100
         : null;
 
     // 月収予想（円）
@@ -184,6 +186,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
         spreadRateDiff,
         subscriberGrowthRate,
         estimatedMonthlyRevenue,
+        channelPublishedAt,
       },
     ];
   });
@@ -219,6 +222,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       "チャンネルアイコン",
       "チャンネル名",
       "チャンネルリンク",
+      "チャンネル作成日",
       "登録者数",
       "登録者前日比増加率(%)",
       "直近1ヶ月投稿本数",
@@ -234,6 +238,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       `=IMAGE("${metrics.channel.thumbnailUrl ?? ""}")`,
       metrics.channel.name,
       buildChannelUrl(metrics.channel.channelId),
+      metrics.channelPublishedAt ? dateObjectToDateString(dayjs(metrics.channelPublishedAt)) : "-",
       metrics.subscriberCount,
       isNotNull(metrics.subscriberGrowthRate)
         ? Math.round(metrics.subscriberGrowthRate * 1000) / 1000
@@ -278,7 +283,9 @@ const main = async () => {
   });
   console.log(`✅スプシ出力完了: ${sheetRows.length}行`);
 
-  await notifySlack(`[monitor] 日次監視完了\n• 対象チャンネル: ${monitorData.activeChannels.length}件`);
+  await notifySlack(
+    `[monitor] 日次監視完了\n• 対象チャンネル: ${monitorData.activeChannels.length}件`,
+  );
 };
 
 main().catch(async (error) => {
