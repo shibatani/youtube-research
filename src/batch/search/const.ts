@@ -3,6 +3,15 @@ export const EXCLUDE_KEYWORDS = [
   "実況",
   "ゲーム実況",
   "ゆっくり実況",
+  "切り抜き",
+  "プレイ動画",
+  "【公式】",
+  "Official",
+  "経歴",
+  "コメンテーター",
+  "UUUM",
+  "VRChat",
+  "試乗",
 ];
 
 export const SEARCH_KEYWORDS = [
