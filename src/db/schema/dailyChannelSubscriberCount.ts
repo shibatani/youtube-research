@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 import dayjs from "dayjs";
 import { v4 as uuid } from "uuid";
 import { channel } from "./channel";
@@ -21,7 +21,13 @@ export const dailyChannelSubscriberCount = sqliteTable(
     createdAt: dayjsTimestamp("created_at")
       .notNull()
       .$defaultFn(() => dayjs()),
-  }
+  },
+  (table) => [
+    uniqueIndex("daily_channel_subscriber_count_channel_date_idx").on(
+      table.channelId,
+      table.businessDate
+    ),
+  ]
 );
 
 // 型エクスポート

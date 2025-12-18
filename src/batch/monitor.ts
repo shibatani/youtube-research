@@ -293,7 +293,7 @@ const main = async () => {
   console.log(`✅スプシ出力完了: ${sheetRows.length}行`);
 
   await notifySlack(
-    `[monitor] 日次監視完了\n• 対象チャンネル: ${monitorData.activeChannels.length}件`,
+    `[monitor] ✅日次監視完了\n• 対象チャンネル: ${monitorData.activeChannels.length}件`,
   );
 };
 
