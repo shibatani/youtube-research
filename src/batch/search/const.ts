@@ -24,7 +24,6 @@ export const EXCLUDE_KEYWORDS = [
   "配信者",
   "ライバー",
   // 配信系
-  "配信",
   "生配信",
   "生放送",
   "ライブ",
