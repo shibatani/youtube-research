@@ -2,7 +2,6 @@ import { google, youtube_v3 } from "googleapis";
 import { chunk } from "lodash";
 import pMap from "p-map";
 import dayjs, { Dayjs } from "dayjs";
-import Parser from "rss-parser";
 import { notifySlack } from "./slack";
 
 const youtube = google.youtube({

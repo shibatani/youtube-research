@@ -6,6 +6,9 @@ export const EXCLUDE_KEYWORDS = [
   "ゆっくり実況",
   "切り抜き",
   "プレイ動画",
+  "FPS",
+  "Steam",
+  "プロハン",
   // 公式・事務所系
   "公式",
   "Official",
@@ -43,6 +46,8 @@ export const EXCLUDE_KEYWORDS = [
   // その他
   "VRChat",
   "試乗",
+  "ファンレター",
+  "ライダー玩具",
 ];
 
 export const SEARCH_KEYWORDS = [
