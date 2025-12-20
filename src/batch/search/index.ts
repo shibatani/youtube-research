@@ -138,6 +138,7 @@ const main = async () => {
     thumbnailUrl: channel.snippet?.thumbnails?.default?.url ?? null,
     description: channel.snippet?.description ?? "",
     isActive: isStealth,
+    isStealth,
   }));
 
   await channel.bulkInsert(newChannels);

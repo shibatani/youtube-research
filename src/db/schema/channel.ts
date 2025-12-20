@@ -15,6 +15,7 @@ export const channel = sqliteTable("channel", {
   thumbnailUrl: text("thumbnail_url"),
   description: text("description").notNull().default(""),
   isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  isStealth: integer("is_stealth", { mode: "boolean" }).notNull().default(true),
   createdAt: dayjsTimestamp("created_at")
     .notNull()
     .$defaultFn(() => dayjs()),
