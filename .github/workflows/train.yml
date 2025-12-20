@@ -1,13 +1,10 @@
-name: Channel Search
+name: Train Model
 
 on:
-  schedule:
-    # 25分ごとに実行 (UTC)
-    - cron: "*/25 * * * *"
-  workflow_dispatch: # 手動実行用
+  workflow_dispatch: # 手動実行のみ
 
 jobs:
-  search:
+  train:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -23,12 +20,10 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Run search batch
+      - name: Run training batch
         env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          FINETUNE_MODEL_ID: ${{ secrets.FINETUNE_MODEL_ID }}
-        run: yarn batch:search
+        run: yarn batch:train

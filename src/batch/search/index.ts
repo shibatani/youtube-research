@@ -2,13 +2,13 @@ import "dotenv/config";
 import { type ChannelInsertInput } from "../../db/schema";
 import { channel, searchLog } from "../../db/repository";
 import { searchVideos, getChannels, duration, searchOrder } from "../../infra/youtube";
-import { buildChannelUrl } from "../../lib/youtube";
 import { notifySlack } from "../../infra/slack";
 import { isNotNullish } from "../../lib/type-guard";
 import { difference, sample } from "lodash";
 import dayjs from "dayjs";
 import { SEARCH_KEYWORDS } from "./const";
-import { filterChannels } from "./filter";
+import { filterByStats, filterByStealth, type JudgeResult } from "./filter";
+import { buildChannelUrl } from "../../lib/youtube";
 
 const saveSearchLog = async (params: {
   hitVideoCount: number;
@@ -24,21 +24,41 @@ const saveSearchLog = async (params: {
     publishedAfter: publishedAfter.toISOString(),
   });
 
-const buildSuccessMessage = ({
+const buildResultMessage = ({
   keyword,
-  channels,
+  passed = [],
+  rejected = [],
 }: {
   keyword: string;
-  channels: { name: string; channelId: string }[];
-}): string =>
-  [
-    `🔍 キーワード: ${keyword}`,
-    `✅ ${channels.length}件のチャンネルを登録しました`,
-    ...channels.map(({ name, channelId }) => `• ${name}\n  ${buildChannelUrl(channelId)}`),
-  ].join("\n");
+  passed?: JudgeResult[];
+  rejected?: JudgeResult[];
+}): string => {
+  if (passed.length === 0 && rejected.length === 0) {
+    return `[search] 🔍 キーワード: ${keyword}\n📭 新規チャンネルは見つかりませんでした`;
+  }
 
-const buildNoResultMessage = ({ keyword }: { keyword: string }): string =>
-  `🔍 キーワード: ${keyword}\n📭 新規チャンネルは見つかりませんでした`;
+  const passedList =
+    passed.length > 0
+      ? passed
+          .map(
+            ({ channel, confidence }) =>
+              `📺 ${channel.snippet?.title} → stealth (${confidence}%)\n   ${buildChannelUrl(channel.id!)}`,
+          )
+          .join("\n")
+      : "なし";
+
+  const rejectedSection =
+    rejected.length > 0
+      ? `\n\n除外:\n${rejected
+          .map(
+            ({ channel, confidence }) =>
+              `❌ ${channel.snippet?.title} → not_stealth (${confidence}%)\n   ${buildChannelUrl(channel.id!)}`,
+          )
+          .join("\n")}`
+      : "";
+
+  return `[search] キーワード「${keyword}」: ${passed.length}件登録\n\n${passedList}${rejectedSection}`;
+};
 
 // ============================
 // 検索条件
@@ -81,41 +101,51 @@ const main = async () => {
   };
 
   if (newChannelIds.length === 0) {
-    const message = buildNoResultMessage({ keyword });
+    const message = buildResultMessage({ keyword });
     console.log(message);
     await saveSearchLog(logParams);
-    await notifySlack(`[search] ${message}`);
+    await notifySlack(message);
     return;
   }
 
   await saveSearchLog(logParams);
 
   const channelDataList = await getChannels({ channelIds: newChannelIds });
-
-  const filteredChannels = filterChannels({ channels: channelDataList });
+  const filteredChannels = filterByStats({ channels: channelDataList });
   console.log(
     `フィルタ後: ${filteredChannels.length}件（除外: ${channelDataList.length - filteredChannels.length}件）`,
   );
 
   if (filteredChannels.length === 0) {
-    const message = buildNoResultMessage({ keyword });
+    const message = buildResultMessage({ keyword });
     console.log(message);
-    await notifySlack(`[search] ${message}`);
+    await notifySlack(message);
     return;
   }
 
-  const newChannels: ChannelInsertInput[] = filteredChannels.map(({ id, snippet }) => ({
-    channelId: id!,
-    name: snippet?.title ?? "不明",
-    thumbnailUrl: snippet?.thumbnails?.default?.url ?? null,
-    description: snippet?.description ?? "",
-  }));
+  const { passed, rejected } = await filterByStealth(filteredChannels);
+  console.log(
+    `Stealth判定: ${passed.length}/${filteredChannels.length}件 通過（除外: ${rejected.length}件）`,
+  );
 
+  if (passed.length === 0) {
+    const message = buildResultMessage({ keyword, rejected });
+    console.log(message);
+    await notifySlack(message);
+    return;
+  }
+
+  const newChannels: ChannelInsertInput[] = passed.map(({ channel: ch }) => ({
+    channelId: ch.id!,
+    name: ch.snippet?.title ?? "不明",
+    thumbnailUrl: ch.snippet?.thumbnails?.default?.url ?? null,
+    description: ch.snippet?.description ?? "",
+  }));
   await channel.bulkInsert(newChannels);
 
-  const message = buildSuccessMessage({ keyword, channels: newChannels });
+  const message = buildResultMessage({ keyword, passed, rejected });
   console.log(message);
-  await notifySlack(`[search] ${message}`);
+  await notifySlack(message);
 };
 
 main().catch(async (error) => {

@@ -1,4 +1,6 @@
 import { type Channel as YouTubeChannel } from "../../infra/youtube";
+import { openai } from "../../infra/openai";
+import { notifySlack } from "../../infra/slack";
 import { EXCLUDE_KEYWORDS } from "./const";
 
 // ============================
@@ -12,7 +14,7 @@ const MIN_AVG_VIEWS_PER_VIDEO = 1000;
 const containsExcludeKeyword = ({ text }: { text: string | null | undefined }): boolean =>
   EXCLUDE_KEYWORDS.some((keyword) => text?.includes(keyword) ?? false);
 
-export const filterChannels = ({ channels }: { channels: YouTubeChannel[] }): YouTubeChannel[] =>
+export const filterByStats = ({ channels }: { channels: YouTubeChannel[] }): YouTubeChannel[] =>
   channels.filter(({ snippet, statistics }) => {
     if (
       containsExcludeKeyword({ text: snippet?.title }) ||
@@ -33,3 +35,69 @@ export const filterChannels = ({ channels }: { channels: YouTubeChannel[] }): Yo
       avgViewsPerVideo >= MIN_AVG_VIEWS_PER_VIDEO
     );
   });
+
+export type JudgeResult = {
+  channel: YouTubeChannel;
+  isStealth: boolean;
+  confidence: number;
+};
+
+export type FilterByStealthResult = {
+  passed: JudgeResult[];
+  rejected: JudgeResult[];
+};
+
+export const filterByStealth = async (
+  channels: YouTubeChannel[],
+): Promise<FilterByStealthResult> => {
+  const modelId = process.env.FINETUNE_MODEL_ID;
+
+  if (!modelId) {
+    console.log("FINETUNE_MODEL_ID未設定: フィルタをスキップ");
+    return {
+      passed: channels.map((channel) => ({
+        channel,
+        isStealth: true,
+        confidence: 100,
+      })),
+      rejected: [],
+    };
+  }
+
+  const results = await Promise.all(
+    channels.map(async (channel) => {
+      try {
+        const response = await openai.chat.completions.create({
+          model: modelId,
+          messages: [
+            {
+              role: "user",
+              content: `チャンネル名: ${channel.snippet?.title}\n説明: ${channel.snippet?.description}`,
+            },
+          ],
+          max_tokens: 10,
+          logprobs: true,
+        });
+
+        const content = response.choices[0]?.message?.content?.trim() ?? "";
+        const isStealth = content === "stealth";
+        const logprob = response.choices[0]?.logprobs?.content?.[0]?.logprob ?? 0;
+        const confidence = Math.round(Math.exp(logprob) * 100);
+
+        return { channel, isStealth, confidence };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`判定エラー: ${channel.snippet?.title}`, error);
+        await notifySlack(
+          `⚠️ [search] Stealth判定エラー\nチャンネル: ${channel.snippet?.title}\n\`\`\`${errorMessage}\`\`\``,
+        );
+        return { channel, isStealth: true, confidence: 0 };
+      }
+    }),
+  );
+
+  return {
+    passed: results.filter(({ isStealth }) => isStealth),
+    rejected: results.filter(({ isStealth }) => !isStealth),
+  };
+};
