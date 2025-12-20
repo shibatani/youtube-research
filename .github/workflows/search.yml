@@ -4,7 +4,12 @@ on:
   schedule:
     # 25分ごとに実行 (UTC)
     - cron: "*/25 * * * *"
-  workflow_dispatch: # 手動実行用
+  workflow_dispatch:
+    inputs:
+      keyword:
+        description: "検索キーワード（空欄でランダム）"
+        required: false
+        type: string
 
 jobs:
   search:
@@ -31,4 +36,5 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FINETUNE_MODEL_ID: ${{ secrets.FINETUNE_MODEL_ID }}
+          SEARCH_KEYWORD: ${{ inputs.keyword }}
         run: yarn batch:search

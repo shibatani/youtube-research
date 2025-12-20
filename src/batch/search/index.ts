@@ -71,7 +71,7 @@ const order = searchOrder.viewCount;
 const publishedAfter = dayjs().subtract(6, "month");
 
 const main = async () => {
-  const keyword = sample(SEARCH_KEYWORDS)!;
+  const keyword = process.env.SEARCH_KEYWORD || process.argv[2] || sample(SEARCH_KEYWORDS)!;
   console.log(`🔍 検索キーワード: ${keyword}`);
 
   const { items: searchResults, totalResults } = await searchVideos({
