@@ -9,6 +9,9 @@ export const EXCLUDE_KEYWORDS = [
   "FPS",
   "Steam",
   "プロハン",
+  "ホラーゲーム",
+  "ホラゲー",
+  "RTA",
   // 公式・事務所系
   "公式",
   "Official",
@@ -42,6 +45,10 @@ export const EXCLUDE_KEYWORDS = [
   "歌ってみた",
   "踊ってみた",
   "子育て",
+  "クッキング",
+  "モトブログ",
+  "ツーリング",
+  "茶番劇",
   // その他
   "VRChat",
   "試乗",
