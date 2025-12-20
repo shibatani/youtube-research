@@ -2,8 +2,8 @@ name: Channel Search
 
 on:
   schedule:
-    # 25分ごとに実行 (UTC)
-    - cron: "*/25 * * * *"
+    # 20分ごとに実行 (UTC)
+    - cron: "*/20 * * * *"
   workflow_dispatch:
     inputs:
       keyword:
