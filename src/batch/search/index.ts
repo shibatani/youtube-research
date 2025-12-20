@@ -7,7 +7,7 @@ import { isNotNullish } from "../../lib/type-guard";
 import { difference, sample } from "lodash";
 import dayjs from "dayjs";
 import { SEARCH_KEYWORDS } from "./const";
-import { filterByStats, filterByStealth, type JudgeResult } from "./filter";
+import { filterByStats, judgeByStealth, type JudgeResult } from "./filter";
 import { buildChannelUrl } from "../../lib/youtube";
 
 const saveSearchLog = async (params: {
@@ -26,20 +26,21 @@ const saveSearchLog = async (params: {
 
 const buildResultMessage = ({
   keyword,
-  passed = [],
-  rejected = [],
+  results = [],
 }: {
   keyword: string;
-  passed?: JudgeResult[];
-  rejected?: JudgeResult[];
+  results?: JudgeResult[];
 }): string => {
-  if (passed.length === 0 && rejected.length === 0) {
+  if (results.length === 0) {
     return `[search] 🔍 キーワード: ${keyword}\n📭 新規チャンネルは見つかりませんでした`;
   }
 
+  const stealth = results.filter(({ isStealth }) => isStealth);
+  const notStealth = results.filter(({ isStealth }) => !isStealth);
+
   const stealthList =
-    passed.length > 0
-      ? passed
+    stealth.length > 0
+      ? stealth
           .map(
             ({ channel, confidence }) =>
               `📺 ${channel.snippet?.title} → stealth (${confidence}%)\n   ${buildChannelUrl(channel.id!)}`,
@@ -48,8 +49,8 @@ const buildResultMessage = ({
       : "";
 
   const notStealthList =
-    rejected.length > 0
-      ? rejected
+    notStealth.length > 0
+      ? notStealth
           .map(
             ({ channel, confidence }) =>
               `🔇 ${channel.snippet?.title} → not_stealth (${confidence}%)\n   ${buildChannelUrl(channel.id!)}`,
@@ -57,10 +58,9 @@ const buildResultMessage = ({
           .join("\n")
       : "";
 
-  const total = passed.length + rejected.length;
   const parts = [stealthList, notStealthList].filter(Boolean).join("\n\n");
 
-  return `[search] キーワード「${keyword}」: ${total}件登録 (stealth: ${passed.length}, not_stealth: ${rejected.length})\n\n${parts}`;
+  return `[search] キーワード「${keyword}」: ${results.length}件登録 (stealth: ${stealth.length}, not_stealth: ${notStealth.length})\n\n${parts}`;
 };
 
 // ============================
@@ -126,32 +126,23 @@ const main = async () => {
     return;
   }
 
-  const { passed, rejected } = await filterByStealth(filteredChannels);
+  const judgeResults = await judgeByStealth(filteredChannels);
+  const stealthCount = judgeResults.filter(({ isStealth }) => isStealth).length;
   console.log(
-    `Stealth判定: ${passed.length}/${filteredChannels.length}件 通過（除外: ${rejected.length}件）`,
+    `Stealth判定: ${stealthCount}/${filteredChannels.length}件 stealth（not_stealth: ${filteredChannels.length - stealthCount}件）`,
   );
 
-  // stealth判定: isActive = true で保存
-  const stealthChannels: ChannelInsertInput[] = passed.map(({ channel }) => ({
+  const newChannels: ChannelInsertInput[] = judgeResults.map(({ channel, isStealth }) => ({
     channelId: channel.id!,
     name: channel.snippet?.title ?? "不明",
     thumbnailUrl: channel.snippet?.thumbnails?.default?.url ?? null,
     description: channel.snippet?.description ?? "",
-    isActive: true,
+    isActive: isStealth,
   }));
 
-  // not_stealth判定: isActive = false で保存
-  const notStealthChannels: ChannelInsertInput[] = rejected.map(({ channel }) => ({
-    channelId: channel.id!,
-    name: channel.snippet?.title ?? "不明",
-    thumbnailUrl: channel.snippet?.thumbnails?.default?.url ?? null,
-    description: channel.snippet?.description ?? "",
-    isActive: false,
-  }));
+  await channel.bulkInsert(newChannels);
 
-  await channel.bulkInsert([...stealthChannels, ...notStealthChannels]);
-
-  const message = buildResultMessage({ keyword, passed, rejected });
+  const message = buildResultMessage({ keyword, results: judgeResults });
   console.log(message);
   await notifySlack(message);
 };

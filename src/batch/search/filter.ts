@@ -42,29 +42,19 @@ export type JudgeResult = {
   confidence: number;
 };
 
-export type FilterByStealthResult = {
-  passed: JudgeResult[];
-  rejected: JudgeResult[];
-};
-
-export const filterByStealth = async (
-  channels: YouTubeChannel[],
-): Promise<FilterByStealthResult> => {
+export const judgeByStealth = async (channels: YouTubeChannel[]): Promise<JudgeResult[]> => {
   const modelId = process.env.FINETUNE_MODEL_ID;
 
   if (!modelId) {
     console.log("FINETUNE_MODEL_ID未設定: フィルタをスキップ");
-    return {
-      passed: channels.map((channel) => ({
-        channel,
-        isStealth: true,
-        confidence: 100,
-      })),
-      rejected: [],
-    };
+    return channels.map((channel) => ({
+      channel,
+      isStealth: true,
+      confidence: 100,
+    }));
   }
 
-  const results = await Promise.all(
+  return Promise.all(
     channels.map(async (channel) => {
       try {
         const response = await openai.chat.completions.create({
@@ -95,9 +85,4 @@ export const filterByStealth = async (
       }
     }),
   );
-
-  return {
-    passed: results.filter(({ isStealth }) => isStealth),
-    rejected: results.filter(({ isStealth }) => !isStealth),
-  };
 };
