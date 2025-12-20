@@ -45,7 +45,7 @@ const buildNoResultMessage = ({ keyword }: { keyword: string }): string =>
 // ============================
 const videoDuration = duration.medium;
 const order = searchOrder.viewCount;
-const publishedAfter = dayjs().subtract(1, "month");
+const publishedAfter = dayjs().subtract(6, "month");
 
 const main = async () => {
   const keyword = sample(SEARCH_KEYWORDS)!;
