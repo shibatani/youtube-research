@@ -108,6 +108,7 @@ const main = async () => {
     channelId: id!,
     name: snippet?.title ?? "不明",
     thumbnailUrl: snippet?.thumbnails?.default?.url ?? null,
+    description: snippet?.description ?? "",
   }));
 
   await channel.bulkInsert(newChannels);

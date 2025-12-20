@@ -13,6 +13,7 @@ export const channel = sqliteTable("channel", {
   channelId: text("channel_id").notNull().unique(), // YouTube channel ID (UC...)
   name: text("name").notNull(),
   thumbnailUrl: text("thumbnail_url"),
+  description: text("description").notNull().default(""),
   isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
   createdAt: dayjsTimestamp("created_at")
     .notNull()
