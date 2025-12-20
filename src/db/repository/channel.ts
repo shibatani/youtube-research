@@ -54,3 +54,14 @@ export const bulkUpdateActiveStatus = async ({
     .where(inArray(channel.id, ids));
 };
 
+/**
+ * 複数チャンネルを非ステルス認定（isActive: false, isStealth: false）
+ */
+export const bulkMarkAsNotStealth = async (ids: string[]): Promise<void> => {
+  if (ids.length === 0) return;
+  await db
+    .update(channel)
+    .set({ isActive: false, isStealth: false })
+    .where(inArray(channel.id, ids));
+};
+
