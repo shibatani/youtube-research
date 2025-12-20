@@ -10,7 +10,7 @@ const main = async () => {
   console.log(`学習データ: ${allChannels.length}件`);
 
   const jsonl = allChannels
-    .map(({ name, description, isActive }) =>
+    .map(({ name, description, isStealth }) =>
       JSON.stringify({
         messages: [
           {
@@ -19,7 +19,7 @@ const main = async () => {
           },
           {
             role: "assistant",
-            content: isActive ? "stealth" : "not_stealth",
+            content: isStealth ? "stealth" : "not_stealth",
           },
         ],
       }),
