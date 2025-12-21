@@ -1,9 +1,9 @@
 import "dotenv/config";
-import "../../config/dayjs";
+import "../config/dayjs";
 import dayjs from "dayjs";
-import { channel } from "../../db/repository";
-import { openai } from "../../infra/openai";
-import { notifySlack } from "../../infra/slack";
+import { channel } from "../db/repository";
+import { openai } from "../infra/openai";
+import { notifySlack } from "../infra/slack";
 
 const main = async () => {
   const allChannels = await channel.getAll();
