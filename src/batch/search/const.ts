@@ -50,6 +50,7 @@ export const EXCLUDE_KEYWORDS = [
   "ツーリング",
   "茶番劇",
   // その他
+  "ゆるのり",
   "VRChat",
   "試乗",
   "ファンレター",
