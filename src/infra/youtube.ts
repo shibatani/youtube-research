@@ -100,6 +100,8 @@ export const searchVideos = async ({
     order,
     videoDuration,
     publishedAfter: publishedAfter?.toISOString(),
+    regionCode: "JP",
+    relevanceLanguage: "ja",
   });
   return {
     items: result.data.items ?? [],
