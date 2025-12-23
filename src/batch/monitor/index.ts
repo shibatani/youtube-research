@@ -1,5 +1,5 @@
 import "dotenv/config";
-import "../config/dayjs";
+import "../../config/dayjs";
 import dayjs from "dayjs";
 import { sumBy } from "lodash";
 import pMap from "p-map";
@@ -7,15 +7,16 @@ import {
   type DailyChannelSubscriberCountInsertInput,
   type DailyChannelMonthlyVideoCountInsertInput,
   type DailyChannelMonthlyViewCountInsertInput,
-} from "../db/schema";
-import { channel, subscriberCount, videoCount, viewCount } from "../db/repository";
-import { getChannels, getChannelVideos, getVideos } from "../infra/youtube";
-import { clearSheet, updateSheet } from "../infra/sheets";
-import { notifySlack } from "../infra/slack";
-import { keyByMap, groupByMap } from "../lib/map";
-import { dateObjectToDateString } from "../lib/date-string";
-import { isNotNull, isNotNullish } from "../lib/type-guard";
-import { buildChannelUrl } from "../lib/youtube";
+} from "../../db/schema";
+import { channel, subscriberCount, videoCount, viewCount } from "../../db/repository";
+import { getChannels, getChannelVideos, getVideos } from "../../infra/youtube";
+import { clearSheet, updateSheet } from "../../infra/sheets";
+import { notifySlack } from "../../infra/slack";
+import { keyByMap, groupByMap } from "../../lib/map";
+import { dateObjectToDateString } from "../../lib/date-string";
+import { isNotNull, isNotNullish } from "../../lib/type-guard";
+import { buildChannelUrl } from "../../lib/youtube";
+import { getBaseSpreadRate } from "./calculator";
 
 /** 秒を「MM:SS」形式に変換 */
 const formatDuration = (seconds: number): string => {
@@ -123,21 +124,15 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
           ) / videoDetails.length
         : 0;
 
-    // 平均高評価率
-    const avgLikeRate =
-      videoDetails.length > 0
-        ? sumBy(videoDetails, ({ statistics }) => {
-            const views = parseInt(statistics?.viewCount ?? "0", 10);
-            const likes = parseInt(statistics?.likeCount ?? "0", 10);
-            return views > 0 ? (likes / views) * 100 : 0;
-          }) / videoDetails.length
-        : 0;
-
     // 平均再生数
     const avgViewCount = videoCount > 0 ? monthlyViewCount / videoCount : 0;
 
     // 拡散率
     const spreadRate = subscriberCount > 0 ? monthlyViewCount / subscriberCount : 0;
+
+    // 基準拡散率・拡散比率
+    const baseSpreadRate = getBaseSpreadRate(subscriberCount);
+    const spreadRatio = (spreadRate / baseSpreadRate) * 100;
 
     // 前日比計算
     const yesterdayVideoCount = channelIdToVideoCountMap.get(activeChannel.id);
@@ -179,9 +174,10 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
         videoCount,
         monthlyViewCount,
         avgDurationSeconds,
-        avgLikeRate,
         avgViewCount,
         spreadRate,
+        baseSpreadRate,
+        spreadRatio,
         avgViewCountDiff,
         spreadRateDiff,
         subscriberGrowthRate,
@@ -227,10 +223,11 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       "登録者前日比増加率(%)",
       "直近1ヶ月投稿本数",
       "平均動画長さ",
-      "平均高評価率(%)",
       "平均再生数",
       "平均再生数前日比(%)",
       "拡散率",
+      "基準拡散率",
+      "拡散比率(%)",
       "拡散率前日比(%)",
       "月収予想(円)",
     ],
@@ -245,10 +242,11 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
         : "-",
       metrics.videoCount,
       formatDuration(metrics.avgDurationSeconds),
-      Math.round(metrics.avgLikeRate * 100) / 100,
       Math.round(metrics.avgViewCount),
       isNotNull(metrics.avgViewCountDiff) ? Math.round(metrics.avgViewCountDiff) : "-",
       Math.round(metrics.spreadRate * 100) / 100,
+      Math.round(metrics.baseSpreadRate * 100) / 100,
+      Math.round(metrics.spreadRatio * 100) / 100,
       isNotNull(metrics.spreadRateDiff) ? Math.round(metrics.spreadRateDiff * 100) / 100 : "-",
       Math.round(metrics.estimatedMonthlyRevenue),
     ]),

@@ -13,7 +13,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "batch:search": "tsx src/batch/search/index.ts",
-    "batch:monitor": "tsx src/batch/monitor.ts",
+    "batch:monitor": "tsx src/batch/monitor/index.ts",
     "batch:train": "tsx src/batch/train.ts"
   },
   "keywords": [
