@@ -9,7 +9,7 @@ import {
   type DailyChannelMonthlyViewCountInsertInput,
 } from "../../db/schema";
 import { channel, subscriberCount, videoCount, viewCount } from "../../db/repository";
-import { getChannels, getChannelVideos, getVideos } from "../../infra/youtube";
+import { getChannels, getChannelVideos, getVideos, checkIsShorts } from "../../infra/youtube";
 import { clearSheet, updateSheet } from "../../infra/sheets";
 import { notifySlack } from "../../infra/slack";
 import { keyByMap, groupByMap } from "../../lib/map";
@@ -52,12 +52,22 @@ const loadChannelMonitorData = async () => {
   });
   console.log(`直近1ヶ月の動画数: ${playlistItems.length}件`);
 
-  const videos = await getVideos({
-    videoIds: playlistItems
-      .map(({ contentDetails }) => contentDetails?.videoId)
-      .filter(isNotNullish),
-  });
+  const videoIds = playlistItems
+    .map(({ contentDetails }) => contentDetails?.videoId)
+    .filter(isNotNullish);
+
+  const videos = await getVideos({ videoIds });
   console.log(`動画詳細取得: ${videos.length}件`);
+
+  const shortsSet = await checkIsShorts({ videoIds });
+  const nonShortsVideos = videos.filter(({ id }) => isNotNullish(id) && !shortsSet.has(id));
+  const nonShortsPlaylistItems = playlistItems.filter(
+    ({ contentDetails }) =>
+      isNotNullish(contentDetails?.videoId) && !shortsSet.has(contentDetails.videoId),
+  );
+  console.log(
+    `Shorts除外: ${videos.length - nonShortsVideos.length}件 → 通常動画: ${nonShortsVideos.length}件`,
+  );
 
   console.log("DB履歴データ取得中...");
   const dbChannelIds = activeChannels.map(({ id }) => id);
@@ -72,8 +82,8 @@ const loadChannelMonitorData = async () => {
     activeChannels,
     playlistItems,
     channelsMap: keyByMap(channels, ({ id }) => id!),
-    videosMap: keyByMap(videos, ({ id }) => id!),
-    channelIdToPlaylistItemsMap: groupByMap(playlistItems, ({ snippet }) => snippet?.channelId!),
+    videosMap: keyByMap(nonShortsVideos, ({ id }) => id!),
+    channelIdToPlaylistItemsMap: groupByMap(nonShortsPlaylistItems, ({ snippet }) => snippet?.channelId!),
     channelIdToSubscriberMap: keyByMap(subscribers, ({ channelId }) => channelId),
     channelIdToVideoCountMap: keyByMap(videoCounts, ({ channelId }) => channelId),
     channelIdToViewCountMap: keyByMap(viewCounts, ({ channelId }) => channelId),
