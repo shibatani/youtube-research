@@ -130,7 +130,7 @@ export const checkIsShorts = async ({
       });
       return res.status === 200 ? videoId : null;
     },
-    { concurrency: 10 },
+    { concurrency: 30 },
   );
   return new Set(results.filter(isNotNull));
 };
