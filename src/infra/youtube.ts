@@ -3,7 +3,6 @@ import { chunk } from "lodash";
 import pMap from "p-map";
 import dayjs, { Dayjs } from "dayjs";
 import { notifySlack } from "./slack";
-import { isNotNull } from "../lib/type-guard";
 
 const youtube = google.youtube({
   version: "v3",
@@ -108,31 +107,6 @@ export const searchVideos = async ({
     items: result.data.items ?? [],
     totalResults: result.data.pageInfo?.totalResults ?? 0,
   };
-};
-
-/**
- * 動画が YouTube Shorts かどうかを一括判定（API クォータ消費なし）
- * Shorts の URL にアクセスして 200 なら Shorts、303 リダイレクトなら通常動画
- * @param videoIds - 判定する動画IDの配列
- * @returns Shorts の動画IDセット
- */
-export const checkIsShorts = async ({
-  videoIds,
-}: {
-  videoIds: string[];
-}): Promise<Set<string>> => {
-  const results = await pMap(
-    videoIds,
-    async (videoId) => {
-      const res = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
-        method: "HEAD",
-        redirect: "manual",
-      });
-      return res.status === 200 ? videoId : null;
-    },
-    { concurrency: 30 },
-  );
-  return new Set(results.filter(isNotNull));
 };
 
 /** チャンネルIDからアップロードプレイリストIDを導出（UC... → UU...） */

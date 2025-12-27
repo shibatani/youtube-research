@@ -9,7 +9,7 @@ import {
   type DailyChannelMonthlyViewCountInsertInput,
 } from "../../db/schema";
 import { channel, subscriberCount, videoCount, viewCount } from "../../db/repository";
-import { getChannels, getChannelVideos, getVideos, checkIsShorts } from "../../infra/youtube";
+import { getChannels, getChannelVideos, getVideos } from "../../infra/youtube";
 import { clearSheet, updateSheet } from "../../infra/sheets";
 import { notifySlack } from "../../infra/slack";
 import { keyByMap, groupByMap } from "../../lib/map";
@@ -28,6 +28,9 @@ const formatDuration = (seconds: number): string => {
 const today = dateObjectToDateString(dayjs());
 const yesterday = dateObjectToDateString(dayjs().subtract(1, "day"));
 const oneMonthAgo = dayjs().subtract(1, "month");
+
+/** Shorts判定の閾値（秒） - 3分以下をShortsとみなす */
+const SHORTS_MAX_DURATION_SECONDS = 180;
 
 /** チャンネル監視に必要なデータを一括取得 */
 const loadChannelMonitorData = async () => {
@@ -59,11 +62,17 @@ const loadChannelMonitorData = async () => {
   const videos = await getVideos({ videoIds });
   console.log(`動画詳細取得: ${videos.length}件`);
 
-  const shortsSet = await checkIsShorts({ videoIds });
-  const nonShortsVideos = videos.filter(({ id }) => isNotNullish(id) && !shortsSet.has(id));
+  const nonShortsVideos = videos.filter(({ contentDetails }) => {
+    const seconds = dayjs.duration(contentDetails?.duration ?? "PT0S").asSeconds();
+    return seconds > SHORTS_MAX_DURATION_SECONDS;
+  });
+  const nonShortsVideosMap = keyByMap(
+    nonShortsVideos.filter(({ id }) => isNotNullish(id)),
+    ({ id }) => id!,
+  );
   const nonShortsPlaylistItems = playlistItems.filter(
     ({ contentDetails }) =>
-      isNotNullish(contentDetails?.videoId) && !shortsSet.has(contentDetails.videoId),
+      isNotNullish(contentDetails?.videoId) && nonShortsVideosMap.has(contentDetails.videoId),
   );
   console.log(
     `Shorts除外: ${videos.length - nonShortsVideos.length}件 → 通常動画: ${nonShortsVideos.length}件`,
@@ -83,7 +92,10 @@ const loadChannelMonitorData = async () => {
     playlistItems,
     channelsMap: keyByMap(channels, ({ id }) => id!),
     videosMap: keyByMap(nonShortsVideos, ({ id }) => id!),
-    channelIdToPlaylistItemsMap: groupByMap(nonShortsPlaylistItems, ({ snippet }) => snippet?.channelId!),
+    channelIdToPlaylistItemsMap: groupByMap(
+      nonShortsPlaylistItems,
+      ({ snippet }) => snippet?.channelId!,
+    ),
     channelIdToSubscriberMap: keyByMap(subscribers, ({ channelId }) => channelId),
     channelIdToVideoCountMap: keyByMap(videoCounts, ({ channelId }) => channelId),
     channelIdToViewCountMap: keyByMap(viewCounts, ({ channelId }) => channelId),
