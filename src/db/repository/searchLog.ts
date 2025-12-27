@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { searchLog, type SearchLog, type SearchLogInsertInput } from "../schema";
-import { gte } from "drizzle-orm";
+import { gte, desc } from "drizzle-orm";
 import type { Dayjs } from "dayjs";
 
 /**
@@ -14,5 +14,9 @@ export const insert = async (data: SearchLogInsertInput): Promise<void> => {
  * 指定日時以降のログを取得
  */
 export const getAfter = async (after: Dayjs): Promise<SearchLog[]> => {
-  return db.select().from(searchLog).where(gte(searchLog.createdAt, after));
+  return db
+    .select()
+    .from(searchLog)
+    .where(gte(searchLog.createdAt, after))
+    .orderBy(desc(searchLog.createdAt));
 };
