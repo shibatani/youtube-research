@@ -241,6 +241,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       "チャンネル名",
       "チャンネルリンク",
       "チャンネル作成日",
+      "DB登録日",
       "登録者数",
       "登録者前日比増加率(%)",
       "直近1ヶ月投稿本数",
@@ -258,6 +259,7 @@ const buildChannelMonitorParams = (data: Awaited<ReturnType<typeof loadChannelMo
       metrics.channel.name,
       buildChannelUrl(metrics.channel.channelId),
       metrics.channelPublishedAt ? dateObjectToDateString(dayjs(metrics.channelPublishedAt)) : "-",
+      dateObjectToDateString(metrics.channel.createdAt),
       metrics.subscriberCount,
       isNotNull(metrics.subscriberGrowthRate)
         ? Math.round(metrics.subscriberGrowthRate * 1000) / 1000
