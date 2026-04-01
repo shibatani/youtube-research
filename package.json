@@ -14,7 +14,8 @@
     "db:studio": "drizzle-kit studio",
     "batch:search": "tsx src/batch/search/index.ts",
     "batch:monitor": "tsx src/batch/monitor/index.ts",
-    "batch:train": "tsx src/batch/train.ts"
+    "batch:train": "tsx src/batch/train.ts",
+    "batch:fukuoka-scout": "tsx src/batch/fukuoka-scout/index.ts"
   },
   "keywords": [
     "youtube",

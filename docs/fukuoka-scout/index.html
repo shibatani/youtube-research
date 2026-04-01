@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fukuoka-scout</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; color: #333; padding: 16px; }
+h1 { font-size: 1.4rem; margin-bottom: 12px; }
+.info { font-size: 0.85rem; color: #666; margin-bottom: 16px; }
+.filters { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.filter-group { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; }
+.filter-group label { white-space: nowrap; font-weight: 600; }
+.filter-group input[type="number"] { width: 80px; padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; }
+.filter-group input[type="text"] { width: 160px; padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; }
+.filter-group select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.15s; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+.card-body { padding: 12px; }
+.title { font-size: 0.9rem; font-weight: 600; color: #333; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+.title:hover { color: #065fd4; }
+.channel { font-size: 0.8rem; color: #666; margin-top: 4px; }
+.metrics { display: flex; gap: 12px; margin-top: 6px; font-size: 0.8rem; color: #555; }
+.metric b { color: #333; }
+.count { font-size: 0.85rem; color: #666; margin-bottom: 8px; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<h1>fukuoka-scout</h1>
+<div class="info">福岡関連YouTube動画 | 76件 | 再生5万回以上</div>
+
+<div class="filters">
+  <div class="filter-group">
+    <label>再生数</label>
+    <input type="number" id="viewMin" placeholder="min">
+    <span>〜</span>
+    <input type="number" id="viewMax" placeholder="max">
+  </div>
+  <div class="filter-group">
+    <label>拡散率</label>
+    <input type="number" id="srMin" placeholder="min" step="0.1">
+    <span>〜</span>
+    <input type="number" id="srMax" placeholder="max" step="0.1">
+  </div>
+  <div class="filter-group">
+    <label>拡散比率(%)</label>
+    <input type="number" id="ratioMin" placeholder="min">
+    <span>〜</span>
+    <input type="number" id="ratioMax" placeholder="max">
+  </div>
+  <div class="filter-group">
+    <label>検索</label>
+    <input type="text" id="textSearch" placeholder="タイトル・CH名">
+  </div>
+  <div class="filter-group">
+    <label>ソート</label>
+    <select id="sortBy">
+      <option value="viewCount">再生数順</option>
+      <option value="spreadRate">拡散率順</option>
+      <option value="spreadRatio">拡散比率順</option>
+    </select>
+  </div>
+</div>
+
+<div class="count" id="count"></div>
+<div class="grid" id="grid">
+
+  <div class="card" data-view-count="976673" data-spread-rate="0.7813384" data-spread-ratio="1008.0365309198148" data-title="福岡）口コミ４千越え超有名ラーメン店の真隣で１７年売れ続ける凄腕ラーメン職人。" data-channel="黙飯 MOKU MESHI TOKYO">
+    <a href="https://www.youtube.com/watch?v=CvQuEDEgncI" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/CvQuEDEgncI/hqdefault.jpg" alt="福岡）口コミ４千越え超有名ラーメン店の真隣で１７年売れ続ける凄腕ラーメン職人。" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=CvQuEDEgncI" target="_blank" rel="noopener" class="title">福岡）口コミ４千越え超有名ラーメン店の真隣で１７年売れ続ける凄腕ラーメン職人。</a>
+      <div class="channel">黙飯 MOKU MESHI TOKYO</div>
+      <div class="metrics">
+        <span class="metric"><b>976,673</b> 再生</span>
+        <span class="metric">登録者 <b>1,250,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.78</b></span>
+        <span class="metric">拡散比率 <b>1008%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="643019" data-spread-rate="1.4070437636761488" data-spread-ratio="1126.9302565985524" data-title="【福岡 久留米DIY】アメカジ古着&amp;とんこつラーメン" data-channel="さらば森田の五反田ガレージ">
+    <a href="https://www.youtube.com/watch?v=Vcwin4kkJS0" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/Vcwin4kkJS0/hqdefault.jpg" alt="【福岡 久留米DIY】アメカジ古着&amp;とんこつラーメン" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=Vcwin4kkJS0" target="_blank" rel="noopener" class="title">【福岡 久留米DIY】アメカジ古着&amp;とんこつラーメン</a>
+      <div class="channel">さらば森田の五反田ガレージ</div>
+      <div class="metrics">
+        <span class="metric"><b>643,019</b> 再生</span>
+        <span class="metric">登録者 <b>457,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.41</b></span>
+        <span class="metric">拡散比率 <b>1127%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="601067" data-spread-rate="6.254599375650364" data-spread-ratio="2392.957449767254" data-title="【石丸伸二VS福岡市長】非公開資料を公開！？民主主義はどうなる？【ReHac9vs高島宗一郎】" data-channel="ReHac9−リハック九州−">
+    <a href="https://www.youtube.com/watch?v=vF11Z0OT-RY" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/vF11Z0OT-RY/hqdefault.jpg" alt="【石丸伸二VS福岡市長】非公開資料を公開！？民主主義はどうなる？【ReHac9vs高島宗一郎】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=vF11Z0OT-RY" target="_blank" rel="noopener" class="title">【石丸伸二VS福岡市長】非公開資料を公開！？民主主義はどうなる？【ReHac9vs高島宗一郎】</a>
+      <div class="channel">ReHac9−リハック九州−</div>
+      <div class="metrics">
+        <span class="metric"><b>601,067</b> 再生</span>
+        <span class="metric">登録者 <b>96,100</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>6.25</b></span>
+        <span class="metric">拡散比率 <b>2393%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="579118" data-spread-rate="1.7549030303030304" data-spread-ratio="1204.6091749687996" data-title="密着！！凄すぎる寿司屋のモーニングルーティーン！【久留米の寿司　一心】マダイ、カンパチ、サーモン　Japan-Kurume's amazing sushi" data-channel="Samurai Food">
+    <a href="https://www.youtube.com/watch?v=tjBymVn5tjw" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/tjBymVn5tjw/hqdefault.jpg" alt="密着！！凄すぎる寿司屋のモーニングルーティーン！【久留米の寿司　一心】マダイ、カンパチ、サーモン　Japan-Kurume's amazing sushi" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=tjBymVn5tjw" target="_blank" rel="noopener" class="title">密着！！凄すぎる寿司屋のモーニングルーティーン！【久留米の寿司　一心】マダイ、カンパチ、サーモン　Japan-Kurume's amazing sushi</a>
+      <div class="channel">Samurai Food</div>
+      <div class="metrics">
+        <span class="metric"><b>579,118</b> 再生</span>
+        <span class="metric">登録者 <b>330,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.75</b></span>
+        <span class="metric">拡散比率 <b>1205%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="485730" data-spread-rate="7.554121306376361" data-spread-ratio="2389.106179518479" data-title="【R藤本×桜 稲垣早希】R藤本、20数年ぶりに故郷・久留米に帰る！「記憶だけを頼りに同級生と会えるのか？」ガチンコ街ブラロケを開始！【GuuGoo】" data-channel="GuuGoo">
+    <a href="https://www.youtube.com/watch?v=7Jx1R5P3Kik" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/7Jx1R5P3Kik/hqdefault.jpg" alt="【R藤本×桜 稲垣早希】R藤本、20数年ぶりに故郷・久留米に帰る！「記憶だけを頼りに同級生と会えるのか？」ガチンコ街ブラロケを開始！【GuuGoo】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=7Jx1R5P3Kik" target="_blank" rel="noopener" class="title">【R藤本×桜 稲垣早希】R藤本、20数年ぶりに故郷・久留米に帰る！「記憶だけを頼りに同級生と会えるのか？」ガチンコ街ブラロケを開始！【GuuGoo】</a>
+      <div class="channel">GuuGoo</div>
+      <div class="metrics">
+        <span class="metric"><b>485,730</b> 再生</span>
+        <span class="metric">登録者 <b>64,300</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>7.55</b></span>
+        <span class="metric">拡散比率 <b>2389%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="376919" data-spread-rate="1.0440969529085873" data-spread-ratio="747.840323614163" data-title="FAN/灘・開成蹴って久留米大附設首席＆東大 学科首席→何も夢がなくフリーター(FAN/バキ童チャンネル/8月22日の彼女)" data-channel="トマホークTomahawk">
+    <a href="https://www.youtube.com/watch?v=yktiwycjAq0" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/yktiwycjAq0/hqdefault.jpg" alt="FAN/灘・開成蹴って久留米大附設首席＆東大 学科首席→何も夢がなくフリーター(FAN/バキ童チャンネル/8月22日の彼女)" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=yktiwycjAq0" target="_blank" rel="noopener" class="title">FAN/灘・開成蹴って久留米大附設首席＆東大 学科首席→何も夢がなくフリーター(FAN/バキ童チャンネル/8月22日の彼女)</a>
+      <div class="channel">トマホークTomahawk</div>
+      <div class="metrics">
+        <span class="metric"><b>376,919</b> 再生</span>
+        <span class="metric">登録者 <b>361,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.04</b></span>
+        <span class="metric">拡散比率 <b>748%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="376264" data-spread-rate="3.4519633027522936" data-spread-ratio="1401.9095135703435" data-title="ブリヂストン吹奏楽団久留米×交響詩「ローマの祭」(Feste Romane)" data-channel="ブレーンYouTubeチャンネル">
+    <a href="https://www.youtube.com/watch?v=ONzctdRk_KY" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/ONzctdRk_KY/hqdefault.jpg" alt="ブリヂストン吹奏楽団久留米×交響詩「ローマの祭」(Feste Romane)" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=ONzctdRk_KY" target="_blank" rel="noopener" class="title">ブリヂストン吹奏楽団久留米×交響詩「ローマの祭」(Feste Romane)</a>
+      <div class="channel">ブレーンYouTubeチャンネル</div>
+      <div class="metrics">
+        <span class="metric"><b>376,264</b> 再生</span>
+        <span class="metric">登録者 <b>109,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>3.45</b></span>
+        <span class="metric">拡散比率 <b>1402%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="365188" data-spread-rate="0.1911979057591623" data-spread-ratio="301.5489902041077" data-title="當白衣天使淪為幕後黑手，4人連續作案騙走千萬日元，久留米護士事件" data-channel="X調查">
+    <a href="https://www.youtube.com/watch?v=cIGUhknok08" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/cIGUhknok08/hqdefault.jpg" alt="當白衣天使淪為幕後黑手，4人連續作案騙走千萬日元，久留米護士事件" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=cIGUhknok08" target="_blank" rel="noopener" class="title">當白衣天使淪為幕後黑手，4人連續作案騙走千萬日元，久留米護士事件</a>
+      <div class="channel">X調查</div>
+      <div class="metrics">
+        <span class="metric"><b>365,188</b> 再生</span>
+        <span class="metric">登録者 <b>1,910,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.19</b></span>
+        <span class="metric">拡散比率 <b>302%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="349504" data-spread-rate="10.401904761904762" data-spread-ratio="2418.875751220527" data-title="【日本🇯🇵福岡】福岡15分鐘去小倉 | 九州最大最新THE OUTLETS KITAKYUSHU | 日本山陽新幹線 | 福岡血併" data-channel="Lazy Edmond HEA爆周圍遊">
+    <a href="https://www.youtube.com/watch?v=-bi37x7oHMQ" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/-bi37x7oHMQ/hqdefault.jpg" alt="【日本🇯🇵福岡】福岡15分鐘去小倉 | 九州最大最新THE OUTLETS KITAKYUSHU | 日本山陽新幹線 | 福岡血併" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=-bi37x7oHMQ" target="_blank" rel="noopener" class="title">【日本🇯🇵福岡】福岡15分鐘去小倉 | 九州最大最新THE OUTLETS KITAKYUSHU | 日本山陽新幹線 | 福岡血併</a>
+      <div class="channel">Lazy Edmond HEA爆周圍遊</div>
+      <div class="metrics">
+        <span class="metric"><b>349,504</b> 再生</span>
+        <span class="metric">登録者 <b>33,600</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>10.4</b></span>
+        <span class="metric">拡散比率 <b>2419%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="302424" data-spread-rate="0.46742503863987633" data-spread-ratio="441.40734837859856" data-title="脱サラして福岡移住を決意し屋台を開業！長浜屋台街で連日賑わう肉巻串が人気のハイテンション屋台店主の1日！Japanese Yatai Street food stall Fukuoka Japan" data-channel="FOOD TOURISM JAPAN / フードツーリズムジャパン">
+    <a href="https://www.youtube.com/watch?v=_jeqfTO9K9w" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/_jeqfTO9K9w/hqdefault.jpg" alt="脱サラして福岡移住を決意し屋台を開業！長浜屋台街で連日賑わう肉巻串が人気のハイテンション屋台店主の1日！Japanese Yatai Street food stall Fukuoka Japan" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=_jeqfTO9K9w" target="_blank" rel="noopener" class="title">脱サラして福岡移住を決意し屋台を開業！長浜屋台街で連日賑わう肉巻串が人気のハイテンション屋台店主の1日！Japanese Yatai Street food stall Fukuoka Japan</a>
+      <div class="channel">FOOD TOURISM JAPAN / フードツーリズムジャパン</div>
+      <div class="metrics">
+        <span class="metric"><b>302,424</b> 再生</span>
+        <span class="metric">登録者 <b>647,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.47</b></span>
+        <span class="metric">拡散比率 <b>441%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="275756" data-spread-rate="0.24403185840707964" data-spread-ratio="300.13471567167846" data-title="【大食い】マジで熱すぎる…。福岡県久留米市にある唯一のジャンボ久留米ラーメン3.8kgを制限時間18分50秒で完食できるのか？【大龍ラーメン 合川店】" data-channel="ぞうさんパクパク 大食い">
+    <a href="https://www.youtube.com/watch?v=IEmoEZ11fcQ" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/IEmoEZ11fcQ/hqdefault.jpg" alt="【大食い】マジで熱すぎる…。福岡県久留米市にある唯一のジャンボ久留米ラーメン3.8kgを制限時間18分50秒で完食できるのか？【大龍ラーメン 合川店】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=IEmoEZ11fcQ" target="_blank" rel="noopener" class="title">【大食い】マジで熱すぎる…。福岡県久留米市にある唯一のジャンボ久留米ラーメン3.8kgを制限時間18分50秒で完食できるのか？【大龍ラーメン 合川店】</a>
+      <div class="channel">ぞうさんパクパク 大食い</div>
+      <div class="metrics">
+        <span class="metric"><b>275,756</b> 再生</span>
+        <span class="metric">登録者 <b>1,130,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.24</b></span>
+        <span class="metric">拡散比率 <b>300%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="262384" data-spread-rate="6.116177156177156" data-spread-ratio="1596.832854086423" data-title="絶対に住みたくない福岡の街ランキングTOP12【ゆっくり解説】" data-channel="ゆっくり地理の雑学大百科">
+    <a href="https://www.youtube.com/watch?v=FqWUC2xphpc" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/FqWUC2xphpc/hqdefault.jpg" alt="絶対に住みたくない福岡の街ランキングTOP12【ゆっくり解説】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=FqWUC2xphpc" target="_blank" rel="noopener" class="title">絶対に住みたくない福岡の街ランキングTOP12【ゆっくり解説】</a>
+      <div class="channel">ゆっくり地理の雑学大百科</div>
+      <div class="metrics">
+        <span class="metric"><b>262,384</b> 再生</span>
+        <span class="metric">登録者 <b>42,900</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>6.12</b></span>
+        <span class="metric">拡散比率 <b>1597%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="252243" data-spread-rate="0.35627542372881355" data-spread-ratio="351.1177305867934" data-title="最近、本気で移住考えてます。" data-channel="独ヲタ女子【＊アッキーch＊】">
+    <a href="https://www.youtube.com/watch?v=X1q0hOuFC7g" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/X1q0hOuFC7g/hqdefault.jpg" alt="最近、本気で移住考えてます。" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=X1q0hOuFC7g" target="_blank" rel="noopener" class="title">最近、本気で移住考えてます。</a>
+      <div class="channel">独ヲタ女子【＊アッキーch＊】</div>
+      <div class="metrics">
+        <span class="metric"><b>252,243</b> 再生</span>
+        <span class="metric">登録者 <b>708,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.36</b></span>
+        <span class="metric">拡散比率 <b>351%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="233152" data-spread-rate="1.5440529801324503" data-spread-ratio="731.7835011503813" data-title="【福岡】久留米とんこつラーメンの代表格「大砲ラーメン」美味しすぎて即完食！【大満足】" data-channel="銀シャリチャンネル【公式】">
+    <a href="https://www.youtube.com/watch?v=aAI-PBmjUn8" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/aAI-PBmjUn8/hqdefault.jpg" alt="【福岡】久留米とんこつラーメンの代表格「大砲ラーメン」美味しすぎて即完食！【大満足】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=aAI-PBmjUn8" target="_blank" rel="noopener" class="title">【福岡】久留米とんこつラーメンの代表格「大砲ラーメン」美味しすぎて即完食！【大満足】</a>
+      <div class="channel">銀シャリチャンネル【公式】</div>
+      <div class="metrics">
+        <span class="metric"><b>233,152</b> 再生</span>
+        <span class="metric">登録者 <b>151,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.54</b></span>
+        <span class="metric">拡散比率 <b>732%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="230432" data-spread-rate="7.706755852842809" data-spread-ratio="1695.765314998524" data-title="【前面展望】 JR九州 久大本線全線 久留米⇒日田⇒豊後森⇒由布院⇒大分 各停" data-channel="ato5kgyasetaito">
+    <a href="https://www.youtube.com/watch?v=9e8zKkJZYvM" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/9e8zKkJZYvM/hqdefault.jpg" alt="【前面展望】 JR九州 久大本線全線 久留米⇒日田⇒豊後森⇒由布院⇒大分 各停" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=9e8zKkJZYvM" target="_blank" rel="noopener" class="title">【前面展望】 JR九州 久大本線全線 久留米⇒日田⇒豊後森⇒由布院⇒大分 各停</a>
+      <div class="channel">ato5kgyasetaito</div>
+      <div class="metrics">
+        <span class="metric"><b>230,432</b> 再生</span>
+        <span class="metric">登録者 <b>29,900</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>7.71</b></span>
+        <span class="metric">拡散比率 <b>1696%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="222934" data-spread-rate="24.881026785714287" data-spread-ratio="3093.0929550406486" data-title="千鳥のロコスタ 福岡県久留米市 サカイストと超絶品！ うなぎに大興奮" data-channel="Bildozr Phone">
+    <a href="https://www.youtube.com/watch?v=oHQFMEAleEE" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/oHQFMEAleEE/hqdefault.jpg" alt="千鳥のロコスタ 福岡県久留米市 サカイストと超絶品！ うなぎに大興奮" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=oHQFMEAleEE" target="_blank" rel="noopener" class="title">千鳥のロコスタ 福岡県久留米市 サカイストと超絶品！ うなぎに大興奮</a>
+      <div class="channel">Bildozr Phone</div>
+      <div class="metrics">
+        <span class="metric"><b>222,934</b> 再生</span>
+        <span class="metric">登録者 <b>8,960</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>24.88</b></span>
+        <span class="metric">拡散比率 <b>3093%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="214976" data-spread-rate="23.992857142857144" data-spread-ratio="2982.679856382689" data-title="千鳥のロコスタ 福岡県久留米市  骨付きカルビ専門店でおもてなし！" data-channel="Bildozr Phone">
+    <a href="https://www.youtube.com/watch?v=5h3YFVi23Zw" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/5h3YFVi23Zw/hqdefault.jpg" alt="千鳥のロコスタ 福岡県久留米市  骨付きカルビ専門店でおもてなし！" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=5h3YFVi23Zw" target="_blank" rel="noopener" class="title">千鳥のロコスタ 福岡県久留米市  骨付きカルビ専門店でおもてなし！</a>
+      <div class="channel">Bildozr Phone</div>
+      <div class="metrics">
+        <span class="metric"><b>214,976</b> 再生</span>
+        <span class="metric">登録者 <b>8,960</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>23.99</b></span>
+        <span class="metric">拡散比率 <b>2983%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="214874" data-spread-rate="2.2382708333333334" data-spread-ratio="855.9213978449684" data-title="【P大海物語5】実践動画！久留米遠征‼️(編集部ビル君実践動画2024/06/12.13）" data-channel="パーラーほびーYouTube店">
+    <a href="https://www.youtube.com/watch?v=uvdo1bpDSuE" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/uvdo1bpDSuE/hqdefault.jpg" alt="【P大海物語5】実践動画！久留米遠征‼️(編集部ビル君実践動画2024/06/12.13）" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=uvdo1bpDSuE" target="_blank" rel="noopener" class="title">【P大海物語5】実践動画！久留米遠征‼️(編集部ビル君実践動画2024/06/12.13）</a>
+      <div class="channel">パーラーほびーYouTube店</div>
+      <div class="metrics">
+        <span class="metric"><b>214,874</b> 再生</span>
+        <span class="metric">登録者 <b>96,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>2.24</b></span>
+        <span class="metric">拡散比率 <b>856%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="212058" data-spread-rate="0.75735" data-spread-ratio="480.9293070321279" data-title="『久留米の友達に会いに行ったら昭和バブルでした』20数年来のお付き合いがあるのに自宅訪問してないことに気がついて遊びに行ったら単車も車も昭和過ぎて最高過ぎました！" data-channel="ガレヨコ『GARAGE YOKOHATA』">
+    <a href="https://www.youtube.com/watch?v=BN6MZVGuxJQ" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/BN6MZVGuxJQ/hqdefault.jpg" alt="『久留米の友達に会いに行ったら昭和バブルでした』20数年来のお付き合いがあるのに自宅訪問してないことに気がついて遊びに行ったら単車も車も昭和過ぎて最高過ぎました！" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=BN6MZVGuxJQ" target="_blank" rel="noopener" class="title">『久留米の友達に会いに行ったら昭和バブルでした』20数年来のお付き合いがあるのに自宅訪問してないことに気がついて遊びに行ったら単車も車も昭和過ぎて最高過ぎました！</a>
+      <div class="channel">ガレヨコ『GARAGE YOKOHATA』</div>
+      <div class="metrics">
+        <span class="metric"><b>212,058</b> 再生</span>
+        <span class="metric">登録者 <b>280,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.76</b></span>
+        <span class="metric">拡散比率 <b>481%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="208059" data-spread-rate="0.10249211822660098" data-spread-ratio="166.38080825423316" data-title="【副首都】大阪ありきに待った？福岡市長を直撃 なぜ名乗りを？副首都化によるデメリットは？｜アベプラ" data-channel="ABEMA Prime #アベプラ【公式】">
+    <a href="https://www.youtube.com/watch?v=JZY05zLjb5k" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/JZY05zLjb5k/hqdefault.jpg" alt="【副首都】大阪ありきに待った？福岡市長を直撃 なぜ名乗りを？副首都化によるデメリットは？｜アベプラ" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=JZY05zLjb5k" target="_blank" rel="noopener" class="title">【副首都】大阪ありきに待った？福岡市長を直撃 なぜ名乗りを？副首都化によるデメリットは？｜アベプラ</a>
+      <div class="channel">ABEMA Prime #アベプラ【公式】</div>
+      <div class="metrics">
+        <span class="metric"><b>208,059</b> 再生</span>
+        <span class="metric">登録者 <b>2,030,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.1</b></span>
+        <span class="metric">拡散比率 <b>166%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="190053" data-spread-rate="0.2937449768160742" data-spread-ratio="277.39462073578085" data-title="ホークスが好きすぎて福岡へ移住を決意し､新たに屋台を開業！福岡･長浜屋台街の復活に尽力する野球大好きワンオペ屋台店主に密着！Fukuoka Yatai Street Food Stall Japan" data-channel="FOOD TOURISM JAPAN / フードツーリズムジャパン">
+    <a href="https://www.youtube.com/watch?v=V81wCY80F6E" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/V81wCY80F6E/hqdefault.jpg" alt="ホークスが好きすぎて福岡へ移住を決意し､新たに屋台を開業！福岡･長浜屋台街の復活に尽力する野球大好きワンオペ屋台店主に密着！Fukuoka Yatai Street Food Stall Japan" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=V81wCY80F6E" target="_blank" rel="noopener" class="title">ホークスが好きすぎて福岡へ移住を決意し､新たに屋台を開業！福岡･長浜屋台街の復活に尽力する野球大好きワンオペ屋台店主に密着！Fukuoka Yatai Street Food Stall Japan</a>
+      <div class="channel">FOOD TOURISM JAPAN / フードツーリズムジャパン</div>
+      <div class="metrics">
+        <span class="metric"><b>190,053</b> 再生</span>
+        <span class="metric">登録者 <b>647,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.29</b></span>
+        <span class="metric">拡散比率 <b>277%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="182067" data-spread-rate="1.9898032786885247" data-spread-ratio="743.7938696259313" data-title="【福岡】久留米は都会ですか？地元民のガイドで中心部を散策してみた" data-channel="福岡ぶらぶら">
+    <a href="https://www.youtube.com/watch?v=RM-Rgh_siH4" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/RM-Rgh_siH4/hqdefault.jpg" alt="【福岡】久留米は都会ですか？地元民のガイドで中心部を散策してみた" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=RM-Rgh_siH4" target="_blank" rel="noopener" class="title">【福岡】久留米は都会ですか？地元民のガイドで中心部を散策してみた</a>
+      <div class="channel">福岡ぶらぶら</div>
+      <div class="metrics">
+        <span class="metric"><b>182,067</b> 再生</span>
+        <span class="metric">登録者 <b>91,500</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.99</b></span>
+        <span class="metric">拡散比率 <b>744%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="181882" data-spread-rate="0.6472669039145907" data-spread-ratio="411.7196488032669" data-title="５５歳で脱サラ…“第２の人生”で作るデカ盛りからあげ弁当にリピーターが続出！" data-channel="食のつながり">
+    <a href="https://www.youtube.com/watch?v=fdFIqz-Gh6w" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/fdFIqz-Gh6w/hqdefault.jpg" alt="５５歳で脱サラ…“第２の人生”で作るデカ盛りからあげ弁当にリピーターが続出！" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=fdFIqz-Gh6w" target="_blank" rel="noopener" class="title">５５歳で脱サラ…“第２の人生”で作るデカ盛りからあげ弁当にリピーターが続出！</a>
+      <div class="channel">食のつながり</div>
+      <div class="metrics">
+        <span class="metric"><b>181,882</b> 再生</span>
+        <span class="metric">登録者 <b>281,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.65</b></span>
+        <span class="metric">拡散比率 <b>412%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="180527" data-spread-rate="13.780687022900764" data-spread-ratio="2050.9503519850387" data-title="大都会福岡の中心市街地がすごい！！【旅行・観光・街歩き】" data-channel="日本ふらふら散策記〜滋賀編〜">
+    <a href="https://www.youtube.com/watch?v=2aDgohB1H38" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/2aDgohB1H38/hqdefault.jpg" alt="大都会福岡の中心市街地がすごい！！【旅行・観光・街歩き】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=2aDgohB1H38" target="_blank" rel="noopener" class="title">大都会福岡の中心市街地がすごい！！【旅行・観光・街歩き】</a>
+      <div class="channel">日本ふらふら散策記〜滋賀編〜</div>
+      <div class="metrics">
+        <span class="metric"><b>180,527</b> 再生</span>
+        <span class="metric">登録者 <b>13,100</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>13.78</b></span>
+        <span class="metric">拡散比率 <b>2051%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="172977" data-spread-rate="0.617775" data-spread-ratio="392.2969599944184" data-title="『日本の芸術デコトラを勉強する#1』久留米の巨匠中村君にお願いしてデコトラのイロハをいちからわかりやすく学びます！知れば知るほど目から鱗こ深い話しに感動！" data-channel="ガレヨコ『GARAGE YOKOHATA』">
+    <a href="https://www.youtube.com/watch?v=zWrh2LDqK3Q" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/zWrh2LDqK3Q/hqdefault.jpg" alt="『日本の芸術デコトラを勉強する#1』久留米の巨匠中村君にお願いしてデコトラのイロハをいちからわかりやすく学びます！知れば知るほど目から鱗こ深い話しに感動！" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=zWrh2LDqK3Q" target="_blank" rel="noopener" class="title">『日本の芸術デコトラを勉強する#1』久留米の巨匠中村君にお願いしてデコトラのイロハをいちからわかりやすく学びます！知れば知るほど目から鱗こ深い話しに感動！</a>
+      <div class="channel">ガレヨコ『GARAGE YOKOHATA』</div>
+      <div class="metrics">
+        <span class="metric"><b>172,977</b> 再生</span>
+        <span class="metric">登録者 <b>280,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.62</b></span>
+        <span class="metric">拡散比率 <b>392%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="169391" data-spread-rate="1992.835294117647" data-spread-ratio="29443.71085764608" data-title="古賀若菜　柔道　久留米" data-channel="横山誠一">
+    <a href="https://www.youtube.com/watch?v=9oynfgEToGU" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/9oynfgEToGU/hqdefault.jpg" alt="古賀若菜　柔道　久留米" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=9oynfgEToGU" target="_blank" rel="noopener" class="title">古賀若菜　柔道　久留米</a>
+      <div class="channel">横山誠一</div>
+      <div class="metrics">
+        <span class="metric"><b>169,391</b> 再生</span>
+        <span class="metric">登録者 <b>85</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1992.84</b></span>
+        <span class="metric">拡散比率 <b>29444%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="165489" data-spread-rate="11.572657342657342" data-spread-ratio="1795.363727943918" data-title="【とんこつ発祥】久留米三大老舗ラーメン店ツアー" data-channel="福岡よかとこch">
+    <a href="https://www.youtube.com/watch?v=28Djxfw9lQo" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/28Djxfw9lQo/hqdefault.jpg" alt="【とんこつ発祥】久留米三大老舗ラーメン店ツアー" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=28Djxfw9lQo" target="_blank" rel="noopener" class="title">【とんこつ発祥】久留米三大老舗ラーメン店ツアー</a>
+      <div class="channel">福岡よかとこch</div>
+      <div class="metrics">
+        <span class="metric"><b>165,489</b> 再生</span>
+        <span class="metric">登録者 <b>14,300</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>11.57</b></span>
+        <span class="metric">拡散比率 <b>1795%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="161585" data-spread-rate="1.958606060606061" data-spread-ratio="697.0823922105911" data-title="【福岡 車中泊】久留米三大Ｂ級グルメと私達の愛した「筑後うどん」の記録。" data-channel="わたりどり とんだ">
+    <a href="https://www.youtube.com/watch?v=p94ssQxIoXs" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/p94ssQxIoXs/hqdefault.jpg" alt="【福岡 車中泊】久留米三大Ｂ級グルメと私達の愛した「筑後うどん」の記録。" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=p94ssQxIoXs" target="_blank" rel="noopener" class="title">【福岡 車中泊】久留米三大Ｂ級グルメと私達の愛した「筑後うどん」の記録。</a>
+      <div class="channel">わたりどり とんだ</div>
+      <div class="metrics">
+        <span class="metric"><b>161,585</b> 再生</span>
+        <span class="metric">登録者 <b>82,500</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.96</b></span>
+        <span class="metric">拡散比率 <b>697%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="160524" data-spread-rate="0.160524" data-spread-ratio="186.32070172525584" data-title="久留米にあるラーメン屋さんでデカ盛りチャレンジに挑戦してきた！！" data-channel="佐賀よかでしょう。">
+    <a href="https://www.youtube.com/watch?v=EwTnW_xOo3w" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/EwTnW_xOo3w/hqdefault.jpg" alt="久留米にあるラーメン屋さんでデカ盛りチャレンジに挑戦してきた！！" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=EwTnW_xOo3w" target="_blank" rel="noopener" class="title">久留米にあるラーメン屋さんでデカ盛りチャレンジに挑戦してきた！！</a>
+      <div class="channel">佐賀よかでしょう。</div>
+      <div class="metrics">
+        <span class="metric"><b>160,524</b> 再生</span>
+        <span class="metric">登録者 <b>1,000,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.16</b></span>
+        <span class="metric">拡散比率 <b>186%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="160203" data-spread-rate="8.754262295081967" data-spread-ratio="1526.4761359371182" data-title="スタジオMJ with 九州男児新鮮組 久留米フェスティバルin天神" data-channel="みってぃチャンネル">
+    <a href="https://www.youtube.com/watch?v=4OwWft1Yx48" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/4OwWft1Yx48/hqdefault.jpg" alt="スタジオMJ with 九州男児新鮮組 久留米フェスティバルin天神" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=4OwWft1Yx48" target="_blank" rel="noopener" class="title">スタジオMJ with 九州男児新鮮組 久留米フェスティバルin天神</a>
+      <div class="channel">みってぃチャンネル</div>
+      <div class="metrics">
+        <span class="metric"><b>160,203</b> 再生</span>
+        <span class="metric">登録者 <b>18,300</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>8.75</b></span>
+        <span class="metric">拡散比率 <b>1526%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="159623" data-spread-rate="0.05303089700996678" data-spread-ratio="103.7516272337993" data-title="【試合フル】あしざるFC vs カフリンガ東久留米 / F GAME.2" data-channel="あしざるFC">
+    <a href="https://www.youtube.com/watch?v=eI2IoaLoctY" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/eI2IoaLoctY/hqdefault.jpg" alt="【試合フル】あしざるFC vs カフリンガ東久留米 / F GAME.2" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=eI2IoaLoctY" target="_blank" rel="noopener" class="title">【試合フル】あしざるFC vs カフリンガ東久留米 / F GAME.2</a>
+      <div class="channel">あしざるFC</div>
+      <div class="metrics">
+        <span class="metric"><b>159,623</b> 再生</span>
+        <span class="metric">登録者 <b>3,010,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.05</b></span>
+        <span class="metric">拡散比率 <b>104%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="148971" data-spread-rate="2.0131216216216217" data-spread-ratio="680.5078513134985" data-title="【真夏のはしご酒】名店ひしめく久留米へ…大正創業の老舗居酒屋＆絶品ホルモン焼鳥店" data-channel="佐藤アナの大酒記">
+    <a href="https://www.youtube.com/watch?v=NB_WNYOCVZw" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/NB_WNYOCVZw/hqdefault.jpg" alt="【真夏のはしご酒】名店ひしめく久留米へ…大正創業の老舗居酒屋＆絶品ホルモン焼鳥店" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=NB_WNYOCVZw" target="_blank" rel="noopener" class="title">【真夏のはしご酒】名店ひしめく久留米へ…大正創業の老舗居酒屋＆絶品ホルモン焼鳥店</a>
+      <div class="channel">佐藤アナの大酒記</div>
+      <div class="metrics">
+        <span class="metric"><b>148,971</b> 再生</span>
+        <span class="metric">登録者 <b>74,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>2.01</b></span>
+        <span class="metric">拡散比率 <b>681%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="148714" data-spread-rate="1.1802698412698414" data-spread-ratio="513.4025392611894" data-title="【公式】   福岡県　久留米市　提供が早い料理店を訪ねる旅　前編 （2021年06月18日OA）｜ゴリパラ見聞録" data-channel="ゴリパラ見聞録">
+    <a href="https://www.youtube.com/watch?v=jWFp6x7UMjg" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/jWFp6x7UMjg/hqdefault.jpg" alt="【公式】   福岡県　久留米市　提供が早い料理店を訪ねる旅　前編 （2021年06月18日OA）｜ゴリパラ見聞録" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=jWFp6x7UMjg" target="_blank" rel="noopener" class="title">【公式】   福岡県　久留米市　提供が早い料理店を訪ねる旅　前編 （2021年06月18日OA）｜ゴリパラ見聞録</a>
+      <div class="channel">ゴリパラ見聞録</div>
+      <div class="metrics">
+        <span class="metric"><b>148,714</b> 再生</span>
+        <span class="metric">登録者 <b>126,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.18</b></span>
+        <span class="metric">拡散比率 <b>513%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="143349" data-spread-rate="5.803603238866397" data-spread-ratio="1166.4836849962046" data-title="九州シゴキャン~福岡で暮らす・働く魅力発掘！~" data-channel="テレビ西日本TNC">
+    <a href="https://www.youtube.com/watch?v=2nfTWqXLUbQ" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/2nfTWqXLUbQ/hqdefault.jpg" alt="九州シゴキャン~福岡で暮らす・働く魅力発掘！~" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=2nfTWqXLUbQ" target="_blank" rel="noopener" class="title">九州シゴキャン~福岡で暮らす・働く魅力発掘！~</a>
+      <div class="channel">テレビ西日本TNC</div>
+      <div class="metrics">
+        <span class="metric"><b>143,349</b> 再生</span>
+        <span class="metric">登録者 <b>24,700</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>5.8</b></span>
+        <span class="metric">拡散比率 <b>1166%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="139439" data-spread-rate="13.031682242990652" data-spread-ratio="1762.1531630285383" data-title="【久留米市】過去最大水位　　今年の水害は僕の身長を超えて浸水しました" data-channel="FARM　CREAT">
+    <a href="https://www.youtube.com/watch?v=c0nuuqkl4sE" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/c0nuuqkl4sE/hqdefault.jpg" alt="【久留米市】過去最大水位　　今年の水害は僕の身長を超えて浸水しました" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=c0nuuqkl4sE" target="_blank" rel="noopener" class="title">【久留米市】過去最大水位　　今年の水害は僕の身長を超えて浸水しました</a>
+      <div class="channel">FARM　CREAT</div>
+      <div class="metrics">
+        <span class="metric"><b>139,439</b> 再生</span>
+        <span class="metric">登録者 <b>10,700</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>13.03</b></span>
+        <span class="metric">拡散比率 <b>1762%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="139070" data-spread-rate="1.1589166666666666" data-spread-ratio="492.5943441258656" data-title="停滞する久留米、伸びる鳥栖。交通拠点が分けた明暗【人口規模だけでは図れない2つの都市】" data-channel="鐵坊主">
+    <a href="https://www.youtube.com/watch?v=BZxQSK7VlbI" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/BZxQSK7VlbI/hqdefault.jpg" alt="停滞する久留米、伸びる鳥栖。交通拠点が分けた明暗【人口規模だけでは図れない2つの都市】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=BZxQSK7VlbI" target="_blank" rel="noopener" class="title">停滞する久留米、伸びる鳥栖。交通拠点が分けた明暗【人口規模だけでは図れない2つの都市】</a>
+      <div class="channel">鐵坊主</div>
+      <div class="metrics">
+        <span class="metric"><b>139,070</b> 再生</span>
+        <span class="metric">登録者 <b>120,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.16</b></span>
+        <span class="metric">拡散比率 <b>493%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="132915" data-spread-rate="0.45991349480968857" data-spread-ratio="296.46312953772787" data-title="【久留米競輪】第50回M競輪：渋谷ABEMAS大集合で楽しむぞ w/白鳥翔　日向藍子　松本吉弘【多井隆晴】" data-channel="たかちゃんねる">
+    <a href="https://www.youtube.com/watch?v=5jhB5keffHU" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/5jhB5keffHU/hqdefault.jpg" alt="【久留米競輪】第50回M競輪：渋谷ABEMAS大集合で楽しむぞ w/白鳥翔　日向藍子　松本吉弘【多井隆晴】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=5jhB5keffHU" target="_blank" rel="noopener" class="title">【久留米競輪】第50回M競輪：渋谷ABEMAS大集合で楽しむぞ w/白鳥翔　日向藍子　松本吉弘【多井隆晴】</a>
+      <div class="channel">たかちゃんねる</div>
+      <div class="metrics">
+        <span class="metric"><b>132,915</b> 再生</span>
+        <span class="metric">登録者 <b>289,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.46</b></span>
+        <span class="metric">拡散比率 <b>296%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="127774" data-spread-rate="0.22857602862254023" data-spread-ratio="201.40745210155924" data-title="【総集編】50㎡店舗をハーブ専門店に作り直す！久留米市の『川の駅』をセルフリノベーション！" data-channel="DIY MAGAZINE">
+    <a href="https://www.youtube.com/watch?v=QXiYgYKvVxI" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/QXiYgYKvVxI/hqdefault.jpg" alt="【総集編】50㎡店舗をハーブ専門店に作り直す！久留米市の『川の駅』をセルフリノベーション！" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=QXiYgYKvVxI" target="_blank" rel="noopener" class="title">【総集編】50㎡店舗をハーブ専門店に作り直す！久留米市の『川の駅』をセルフリノベーション！</a>
+      <div class="channel">DIY MAGAZINE</div>
+      <div class="metrics">
+        <span class="metric"><b>127,774</b> 再生</span>
+        <span class="metric">登録者 <b>559,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.23</b></span>
+        <span class="metric">拡散比率 <b>201%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="122135" data-spread-rate="639.4502617801047" data-spread-ratio="12837.531343529352" data-title="2016第46回久留米ちくご大歌舞伎-歌舞伎十八番の内　勧進帳（かぶきじゅうはちばんのうち　かんじんちょう）" data-channel="坂田良二">
+    <a href="https://www.youtube.com/watch?v=EvmwztI9p3Y" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/EvmwztI9p3Y/hqdefault.jpg" alt="2016第46回久留米ちくご大歌舞伎-歌舞伎十八番の内　勧進帳（かぶきじゅうはちばんのうち　かんじんちょう）" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=EvmwztI9p3Y" target="_blank" rel="noopener" class="title">2016第46回久留米ちくご大歌舞伎-歌舞伎十八番の内　勧進帳（かぶきじゅうはちばんのうち　かんじんちょう）</a>
+      <div class="channel">坂田良二</div>
+      <div class="metrics">
+        <span class="metric"><b>122,135</b> 再生</span>
+        <span class="metric">登録者 <b>191</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>639.45</b></span>
+        <span class="metric">拡散比率 <b>12838%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="121599" data-spread-rate="0.9650714285714286" data-spread-ratio="419.79393582057753" data-title="【公式】福岡県　久留米市　提供が早い料理店を訪ねる旅　後編（2021年06月25日OA）｜ゴリパラ見聞録" data-channel="ゴリパラ見聞録">
+    <a href="https://www.youtube.com/watch?v=potke-4m4Vs" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/potke-4m4Vs/hqdefault.jpg" alt="【公式】福岡県　久留米市　提供が早い料理店を訪ねる旅　後編（2021年06月25日OA）｜ゴリパラ見聞録" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=potke-4m4Vs" target="_blank" rel="noopener" class="title">【公式】福岡県　久留米市　提供が早い料理店を訪ねる旅　後編（2021年06月25日OA）｜ゴリパラ見聞録</a>
+      <div class="channel">ゴリパラ見聞録</div>
+      <div class="metrics">
+        <span class="metric"><b>121,599</b> 再生</span>
+        <span class="metric">登録者 <b>126,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.97</b></span>
+        <span class="metric">拡散比率 <b>420%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="117760" data-spread-rate="1.6109439124487004" data-spread-ratio="541.4091750310442" data-title="【清瀬・東久留米・西東京】～空からみる東京地北多摩北部エリア～" data-channel="ゆっくり地図旅">
+    <a href="https://www.youtube.com/watch?v=Bb1Dkmj57sw" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/Bb1Dkmj57sw/hqdefault.jpg" alt="【清瀬・東久留米・西東京】～空からみる東京地北多摩北部エリア～" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=Bb1Dkmj57sw" target="_blank" rel="noopener" class="title">【清瀬・東久留米・西東京】～空からみる東京地北多摩北部エリア～</a>
+      <div class="channel">ゆっくり地図旅</div>
+      <div class="metrics">
+        <span class="metric"><b>117,760</b> 再生</span>
+        <span class="metric">登録者 <b>73,100</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.61</b></span>
+        <span class="metric">拡散比率 <b>541%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="117233" data-spread-rate="4.294249084249084" data-spread-ratio="905.0284505588252" data-title="【福岡市7区の都会度ランキング】中央、博多、東、南、早良、城南、西の7区を徹底比較！！" data-channel="【地理チャンネル】とどーふ研究室">
+    <a href="https://www.youtube.com/watch?v=O6sgTn_PdoE" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/O6sgTn_PdoE/hqdefault.jpg" alt="【福岡市7区の都会度ランキング】中央、博多、東、南、早良、城南、西の7区を徹底比較！！" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=O6sgTn_PdoE" target="_blank" rel="noopener" class="title">【福岡市7区の都会度ランキング】中央、博多、東、南、早良、城南、西の7区を徹底比較！！</a>
+      <div class="channel">【地理チャンネル】とどーふ研究室</div>
+      <div class="metrics">
+        <span class="metric"><b>117,233</b> 再生</span>
+        <span class="metric">登録者 <b>27,300</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>4.29</b></span>
+        <span class="metric">拡散比率 <b>905%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="115606" data-spread-rate="190.4546952224053" data-spread-ratio="6612.834040783592" data-title="2023これが本物の久留米ラーメンBEST10" data-channel="久留米がばでしょう「たけし軍団」">
+    <a href="https://www.youtube.com/watch?v=yOteR2RdhIw" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/yOteR2RdhIw/hqdefault.jpg" alt="2023これが本物の久留米ラーメンBEST10" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=yOteR2RdhIw" target="_blank" rel="noopener" class="title">2023これが本物の久留米ラーメンBEST10</a>
+      <div class="channel">久留米がばでしょう「たけし軍団」</div>
+      <div class="metrics">
+        <span class="metric"><b>115,606</b> 再生</span>
+        <span class="metric">登録者 <b>607</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>190.45</b></span>
+        <span class="metric">拡散比率 <b>6613%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="113556" data-spread-rate="0.3929273356401384" data-spread-ratio="253.28343029595027" data-title="【久留米競輪】初登場！高宮まりプロとM競輪でたかまりさんぽ！【多井隆晴/高宮まり】" data-channel="たかちゃんねる">
+    <a href="https://www.youtube.com/watch?v=r5r2LRF89EI" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/r5r2LRF89EI/hqdefault.jpg" alt="【久留米競輪】初登場！高宮まりプロとM競輪でたかまりさんぽ！【多井隆晴/高宮まり】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=r5r2LRF89EI" target="_blank" rel="noopener" class="title">【久留米競輪】初登場！高宮まりプロとM競輪でたかまりさんぽ！【多井隆晴/高宮まり】</a>
+      <div class="channel">たかちゃんねる</div>
+      <div class="metrics">
+        <span class="metric"><b>113,556</b> 再生</span>
+        <span class="metric">登録者 <b>289,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.39</b></span>
+        <span class="metric">拡散比率 <b>253%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="110513" data-spread-rate="0.1456034255599473" data-spread-ratio="148.303460204458" data-title="【衝撃映像ありの久留米遠征！魔王をぶっ倒してやる】いち花の大返済 第27話《いち花・鬼Dイッチー・ショウタク》eフィーバーからくりサーカス2 魔王ver.［パチンコ・スマパチ］" data-channel="【公式】DMMぱちタウンch">
+    <a href="https://www.youtube.com/watch?v=d-zr02nfiOg" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/d-zr02nfiOg/hqdefault.jpg" alt="【衝撃映像ありの久留米遠征！魔王をぶっ倒してやる】いち花の大返済 第27話《いち花・鬼Dイッチー・ショウタク》eフィーバーからくりサーカス2 魔王ver.［パチンコ・スマパチ］" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=d-zr02nfiOg" target="_blank" rel="noopener" class="title">【衝撃映像ありの久留米遠征！魔王をぶっ倒してやる】いち花の大返済 第27話《いち花・鬼Dイッチー・ショウタク》eフィーバーからくりサーカス2 魔王ver.［パチンコ・スマパチ］</a>
+      <div class="channel">【公式】DMMぱちタウンch</div>
+      <div class="metrics">
+        <span class="metric"><b>110,513</b> 再生</span>
+        <span class="metric">登録者 <b>759,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.15</b></span>
+        <span class="metric">拡散比率 <b>148%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="106261" data-spread-rate="0.378153024911032" data-spread-ratio="240.53914956666375" data-title="【年末特集】１日で５０００食。福岡No.１怪物大行列うどんそば屋の年越しに密着！" data-channel="食のつながり">
+    <a href="https://www.youtube.com/watch?v=7h9j4qKPLVU" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/7h9j4qKPLVU/hqdefault.jpg" alt="【年末特集】１日で５０００食。福岡No.１怪物大行列うどんそば屋の年越しに密着！" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=7h9j4qKPLVU" target="_blank" rel="noopener" class="title">【年末特集】１日で５０００食。福岡No.１怪物大行列うどんそば屋の年越しに密着！</a>
+      <div class="channel">食のつながり</div>
+      <div class="metrics">
+        <span class="metric"><b>106,261</b> 再生</span>
+        <span class="metric">登録者 <b>281,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.38</b></span>
+        <span class="metric">拡散比率 <b>241%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="104925" data-spread-rate="0.6948675496688742" data-spread-ratio="329.3232906353099" data-title="今すぐ福岡に引っ越すべき理由をお教えします" data-channel="大人の教養TV 2nd">
+    <a href="https://www.youtube.com/watch?v=5ojp9puYS1A" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/5ojp9puYS1A/hqdefault.jpg" alt="今すぐ福岡に引っ越すべき理由をお教えします" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=5ojp9puYS1A" target="_blank" rel="noopener" class="title">今すぐ福岡に引っ越すべき理由をお教えします</a>
+      <div class="channel">大人の教養TV 2nd</div>
+      <div class="metrics">
+        <span class="metric"><b>104,925</b> 再生</span>
+        <span class="metric">登録者 <b>151,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.69</b></span>
+        <span class="metric">拡散比率 <b>329%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="102752" data-spread-rate="0.25560199004975126" data-spread-ratio="192.64940534978757" data-title="山本太郎（れいわ新選組代表）おしゃべり会 久留米市 2019年10月27日" data-channel="れいわ新選組 公式チャンネル">
+    <a href="https://www.youtube.com/watch?v=SK5jO2Bzyh8" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/SK5jO2Bzyh8/hqdefault.jpg" alt="山本太郎（れいわ新選組代表）おしゃべり会 久留米市 2019年10月27日" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=SK5jO2Bzyh8" target="_blank" rel="noopener" class="title">山本太郎（れいわ新選組代表）おしゃべり会 久留米市 2019年10月27日</a>
+      <div class="channel">れいわ新選組 公式チャンネル</div>
+      <div class="metrics">
+        <span class="metric"><b>102,752</b> 再生</span>
+        <span class="metric">登録者 <b>402,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.26</b></span>
+        <span class="metric">拡散比率 <b>193%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="102036" data-spread-rate="2.340275229357798" data-spread-ratio="615.7108014814814" data-title="チャリロト公式Youtube 加藤慎平の「ぺーちゃんねる」Vol.287 久留米競輪場 能支第３０回中野カップレース [ＧⅢ] 06/23（日）【2日目】 #久留米競輪　#久留米競輪ライブ" data-channel="チャリロト公式競輪番組 加藤慎平の「ぺーちゃんねる」">
+    <a href="https://www.youtube.com/watch?v=O_OnF9M5WLE" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/O_OnF9M5WLE/hqdefault.jpg" alt="チャリロト公式Youtube 加藤慎平の「ぺーちゃんねる」Vol.287 久留米競輪場 能支第３０回中野カップレース [ＧⅢ] 06/23（日）【2日目】 #久留米競輪　#久留米競輪ライブ" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=O_OnF9M5WLE" target="_blank" rel="noopener" class="title">チャリロト公式Youtube 加藤慎平の「ぺーちゃんねる」Vol.287 久留米競輪場 能支第３０回中野カップレース [ＧⅢ] 06/23（日）【2日目】 #久留米競輪　#久留米競輪ライブ</a>
+      <div class="channel">チャリロト公式競輪番組 加藤慎平の「ぺーちゃんねる」</div>
+      <div class="metrics">
+        <span class="metric"><b>102,036</b> 再生</span>
+        <span class="metric">登録者 <b>43,600</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>2.34</b></span>
+        <span class="metric">拡散比率 <b>616%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="101706" data-spread-rate="0.33237254901960783" data-spread-ratio="220.13094486528888" data-title="【東京vs革命】sasuke vs ガイモン福岡久留米対決【頂上決戦バトル#5】前半" data-channel="頂 - ITADAKI -">
+    <a href="https://www.youtube.com/watch?v=g70wi0L2rtw" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/g70wi0L2rtw/hqdefault.jpg" alt="【東京vs革命】sasuke vs ガイモン福岡久留米対決【頂上決戦バトル#5】前半" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=g70wi0L2rtw" target="_blank" rel="noopener" class="title">【東京vs革命】sasuke vs ガイモン福岡久留米対決【頂上決戦バトル#5】前半</a>
+      <div class="channel">頂 - ITADAKI -</div>
+      <div class="metrics">
+        <span class="metric"><b>101,706</b> 再生</span>
+        <span class="metric">登録者 <b>306,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.33</b></span>
+        <span class="metric">拡散比率 <b>220%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="101089" data-spread-rate="49.55343137254902" data-spread-ratio="3055.6080419998475" data-title="【日本地理】絶対に住みたくない福岡県の街ランキングTOP10【ゆっくり解説】" data-channel="地理ヤバすぎ図鑑【ゆっくり解説】">
+    <a href="https://www.youtube.com/watch?v=9jpr5jGChFo" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/9jpr5jGChFo/hqdefault.jpg" alt="【日本地理】絶対に住みたくない福岡県の街ランキングTOP10【ゆっくり解説】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=9jpr5jGChFo" target="_blank" rel="noopener" class="title">【日本地理】絶対に住みたくない福岡県の街ランキングTOP10【ゆっくり解説】</a>
+      <div class="channel">地理ヤバすぎ図鑑【ゆっくり解説】</div>
+      <div class="metrics">
+        <span class="metric"><b>101,089</b> 再生</span>
+        <span class="metric">登録者 <b>2,040</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>49.55</b></span>
+        <span class="metric">拡散比率 <b>3056%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="93423" data-spread-rate="13.422844827586207" data-spread-ratio="1480.450753701554" data-title="【保存版】福岡で資産価値が落ちない住宅エリアTOP10" data-channel="でんホームの家づくり情報ch">
+    <a href="https://www.youtube.com/watch?v=VhTO3g_u0s8" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/VhTO3g_u0s8/hqdefault.jpg" alt="【保存版】福岡で資産価値が落ちない住宅エリアTOP10" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=VhTO3g_u0s8" target="_blank" rel="noopener" class="title">【保存版】福岡で資産価値が落ちない住宅エリアTOP10</a>
+      <div class="channel">でんホームの家づくり情報ch</div>
+      <div class="metrics">
+        <span class="metric"><b>93,423</b> 再生</span>
+        <span class="metric">登録者 <b>6,960</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>13.42</b></span>
+        <span class="metric">拡散比率 <b>1480%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="91374" data-spread-rate="1.8685889570552148" data-spread-ratio="519.0742121372406" data-title="【春中・決勝】東久留米市立西中学校(東京都) vs 氷見市立西條中学校(富山県) | 第19回春の全国中学生ハンドボール選手権大会　男子４６　福島県営あづま総合体育館" data-channel="動画時代!【公式】">
+    <a href="https://www.youtube.com/watch?v=9DmlTbcxHfA" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/9DmlTbcxHfA/hqdefault.jpg" alt="【春中・決勝】東久留米市立西中学校(東京都) vs 氷見市立西條中学校(富山県) | 第19回春の全国中学生ハンドボール選手権大会　男子４６　福島県営あづま総合体育館" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=9DmlTbcxHfA" target="_blank" rel="noopener" class="title">【春中・決勝】東久留米市立西中学校(東京都) vs 氷見市立西條中学校(富山県) | 第19回春の全国中学生ハンドボール選手権大会　男子４６　福島県営あづま総合体育館</a>
+      <div class="channel">動画時代!【公式】</div>
+      <div class="metrics">
+        <span class="metric"><b>91,374</b> 再生</span>
+        <span class="metric">登録者 <b>48,900</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.87</b></span>
+        <span class="metric">拡散比率 <b>519%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="90714" data-spread-rate="6.8206015037593986" data-spread-ratio="1022.4091369953496" data-title="福岡移住情報 | 地方に移住を考えてる方向け！福岡に住むリアルなメリット・デメリット！Fukuoka" data-channel="しいの動画">
+    <a href="https://www.youtube.com/watch?v=9JaL7JZlzvE" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/9JaL7JZlzvE/hqdefault.jpg" alt="福岡移住情報 | 地方に移住を考えてる方向け！福岡に住むリアルなメリット・デメリット！Fukuoka" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=9JaL7JZlzvE" target="_blank" rel="noopener" class="title">福岡移住情報 | 地方に移住を考えてる方向け！福岡に住むリアルなメリット・デメリット！Fukuoka</a>
+      <div class="channel">しいの動画</div>
+      <div class="metrics">
+        <span class="metric"><b>90,714</b> 再生</span>
+        <span class="metric">登録者 <b>13,300</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>6.82</b></span>
+        <span class="metric">拡散比率 <b>1022%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="90225" data-spread-rate="20.275280898876403" data-spread-ratio="1809.1767212114448" data-title="削ろう会久留米大会　寸八鉋・決勝　杉の薄削り　字幕付き/39分版　Kezuroukai" data-channel="削ろう会">
+    <a href="https://www.youtube.com/watch?v=02dRX8l9s3U" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/02dRX8l9s3U/hqdefault.jpg" alt="削ろう会久留米大会　寸八鉋・決勝　杉の薄削り　字幕付き/39分版　Kezuroukai" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=02dRX8l9s3U" target="_blank" rel="noopener" class="title">削ろう会久留米大会　寸八鉋・決勝　杉の薄削り　字幕付き/39分版　Kezuroukai</a>
+      <div class="channel">削ろう会</div>
+      <div class="metrics">
+        <span class="metric"><b>90,225</b> 再生</span>
+        <span class="metric">登録者 <b>4,450</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>20.28</b></span>
+        <span class="metric">拡散比率 <b>1809%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="89903" data-spread-rate="1.2954322766570605" data-spread-ratio="424.7877350219228" data-title="久留米の南、八女の北　耳納山地の傾動地塊とは？" data-channel="地理ライダー">
+    <a href="https://www.youtube.com/watch?v=vxtWKBTPkEU" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/vxtWKBTPkEU/hqdefault.jpg" alt="久留米の南、八女の北　耳納山地の傾動地塊とは？" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=vxtWKBTPkEU" target="_blank" rel="noopener" class="title">久留米の南、八女の北　耳納山地の傾動地塊とは？</a>
+      <div class="channel">地理ライダー</div>
+      <div class="metrics">
+        <span class="metric"><b>89,903</b> 再生</span>
+        <span class="metric">登録者 <b>69,400</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.3</b></span>
+        <span class="metric">拡散比率 <b>425%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="89458" data-spread-rate="2.051788990825688" data-spread-ratio="539.8119965397542" data-title="チャリロト公式Youtube 加藤慎平の「ぺーちゃんねる」Vol.267 久留米競輪場 能登半島支援・第２回オールガールズクラシック [ＧⅠ] 04/28（日）【決　勝】 #久留米競輪 #久留米競輪" data-channel="チャリロト公式競輪番組 加藤慎平の「ぺーちゃんねる」">
+    <a href="https://www.youtube.com/watch?v=9n-uBLnsRDU" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/9n-uBLnsRDU/hqdefault.jpg" alt="チャリロト公式Youtube 加藤慎平の「ぺーちゃんねる」Vol.267 久留米競輪場 能登半島支援・第２回オールガールズクラシック [ＧⅠ] 04/28（日）【決　勝】 #久留米競輪 #久留米競輪" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=9n-uBLnsRDU" target="_blank" rel="noopener" class="title">チャリロト公式Youtube 加藤慎平の「ぺーちゃんねる」Vol.267 久留米競輪場 能登半島支援・第２回オールガールズクラシック [ＧⅠ] 04/28（日）【決　勝】 #久留米競輪 #久留米競輪</a>
+      <div class="channel">チャリロト公式競輪番組 加藤慎平の「ぺーちゃんねる」</div>
+      <div class="metrics">
+        <span class="metric"><b>89,458</b> 再生</span>
+        <span class="metric">登録者 <b>43,600</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>2.05</b></span>
+        <span class="metric">拡散比率 <b>540%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="89075" data-spread-rate="4.867486338797814" data-spread-ratio="848.7410461015013" data-title="ASTERISM (アステリズム) 久留米フェスティバル in天神 2017" data-channel="みってぃチャンネル">
+    <a href="https://www.youtube.com/watch?v=zjbQWDNOLq8" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/zjbQWDNOLq8/hqdefault.jpg" alt="ASTERISM (アステリズム) 久留米フェスティバル in天神 2017" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=zjbQWDNOLq8" target="_blank" rel="noopener" class="title">ASTERISM (アステリズム) 久留米フェスティバル in天神 2017</a>
+      <div class="channel">みってぃチャンネル</div>
+      <div class="metrics">
+        <span class="metric"><b>89,075</b> 再生</span>
+        <span class="metric">登録者 <b>18,300</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>4.87</b></span>
+        <span class="metric">拡散比率 <b>849%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="88259" data-spread-rate="4.480152284263959" data-spread-ratio="808.9692472052891" data-title="地元民激推し【福岡グルメ】久留米ラーメンの旨い店3選！とんこつラーメンにハマる瞬間" data-channel="ピーコボ@日本一周旨いものハンター!">
+    <a href="https://www.youtube.com/watch?v=aR4dBOPvKpc" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/aR4dBOPvKpc/hqdefault.jpg" alt="地元民激推し【福岡グルメ】久留米ラーメンの旨い店3選！とんこつラーメンにハマる瞬間" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=aR4dBOPvKpc" target="_blank" rel="noopener" class="title">地元民激推し【福岡グルメ】久留米ラーメンの旨い店3選！とんこつラーメンにハマる瞬間</a>
+      <div class="channel">ピーコボ@日本一周旨いものハンター!</div>
+      <div class="metrics">
+        <span class="metric"><b>88,259</b> 再生</span>
+        <span class="metric">登録者 <b>19,700</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>4.48</b></span>
+        <span class="metric">拡散比率 <b>809%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="87078" data-spread-rate="143.69306930693068" data-spread-ratio="4985.3136708332695" data-title="【編集版】東京都議会議員選挙 北多摩第四(東久留米市・清瀬市)選挙区 公開討論会（令和7年）" data-channel="清瀬青年会議所  ">
+    <a href="https://www.youtube.com/watch?v=N4WxqypYxJM" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/N4WxqypYxJM/hqdefault.jpg" alt="【編集版】東京都議会議員選挙 北多摩第四(東久留米市・清瀬市)選挙区 公開討論会（令和7年）" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=N4WxqypYxJM" target="_blank" rel="noopener" class="title">【編集版】東京都議会議員選挙 北多摩第四(東久留米市・清瀬市)選挙区 公開討論会（令和7年）</a>
+      <div class="channel">清瀬青年会議所  </div>
+      <div class="metrics">
+        <span class="metric"><b>87,078</b> 再生</span>
+        <span class="metric">登録者 <b>606</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>143.69</b></span>
+        <span class="metric">拡散比率 <b>4985%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="86715" data-spread-rate="16.67596153846154" data-spread-ratio="1601.9701042275287" data-title="【パチスロ生配信】ヴヴヴ2からの新台ノゲノラ！！！【EVO37久留米&amp;ユーコーラッキー37ゆめパーク久留米店】パチンコ パチスロ 実戦 生放送" data-channel="中野六区">
+    <a href="https://www.youtube.com/watch?v=jN2-Mh_3t44" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/jN2-Mh_3t44/hqdefault.jpg" alt="【パチスロ生配信】ヴヴヴ2からの新台ノゲノラ！！！【EVO37久留米&amp;ユーコーラッキー37ゆめパーク久留米店】パチンコ パチスロ 実戦 生放送" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=jN2-Mh_3t44" target="_blank" rel="noopener" class="title">【パチスロ生配信】ヴヴヴ2からの新台ノゲノラ！！！【EVO37久留米&amp;ユーコーラッキー37ゆめパーク久留米店】パチンコ パチスロ 実戦 生放送</a>
+      <div class="channel">中野六区</div>
+      <div class="metrics">
+        <span class="metric"><b>86,715</b> 再生</span>
+        <span class="metric">登録者 <b>5,200</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>16.68</b></span>
+        <span class="metric">拡散比率 <b>1602%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="86508" data-spread-rate="0.2827058823529412" data-spread-ratio="187.2366210293042" data-title="【ヴァルヴレイヴvs㊙︎】sasuke vs ガイモン久留米対決【頂上決戦バトル#3】前半" data-channel="頂 - ITADAKI -">
+    <a href="https://www.youtube.com/watch?v=muFoAKLGpAE" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/muFoAKLGpAE/hqdefault.jpg" alt="【ヴァルヴレイヴvs㊙︎】sasuke vs ガイモン久留米対決【頂上決戦バトル#3】前半" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=muFoAKLGpAE" target="_blank" rel="noopener" class="title">【ヴァルヴレイヴvs㊙︎】sasuke vs ガイモン久留米対決【頂上決戦バトル#3】前半</a>
+      <div class="channel">頂 - ITADAKI -</div>
+      <div class="metrics">
+        <span class="metric"><b>86,508</b> 再生</span>
+        <span class="metric">登録者 <b>306,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.28</b></span>
+        <span class="metric">拡散比率 <b>187%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="85618" data-spread-rate="1.9637155963302753" data-spread-ratio="516.6404739625375" data-title="チャリロト公式Youtube 加藤慎平の「ぺーちゃんねる」Vol.286 久留米競輪場 能支第３０回中野カップレース [ＧⅢ] 06/22（土）【1日目】 #久留米競輪　#久留米競輪ライブ" data-channel="チャリロト公式競輪番組 加藤慎平の「ぺーちゃんねる」">
+    <a href="https://www.youtube.com/watch?v=HOiyDG-R8vg" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/HOiyDG-R8vg/hqdefault.jpg" alt="チャリロト公式Youtube 加藤慎平の「ぺーちゃんねる」Vol.286 久留米競輪場 能支第３０回中野カップレース [ＧⅢ] 06/22（土）【1日目】 #久留米競輪　#久留米競輪ライブ" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=HOiyDG-R8vg" target="_blank" rel="noopener" class="title">チャリロト公式Youtube 加藤慎平の「ぺーちゃんねる」Vol.286 久留米競輪場 能支第３０回中野カップレース [ＧⅢ] 06/22（土）【1日目】 #久留米競輪　#久留米競輪ライブ</a>
+      <div class="channel">チャリロト公式競輪番組 加藤慎平の「ぺーちゃんねる」</div>
+      <div class="metrics">
+        <span class="metric"><b>85,618</b> 再生</span>
+        <span class="metric">登録者 <b>43,600</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.96</b></span>
+        <span class="metric">拡散比率 <b>517%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="82936" data-spread-rate="5.3507096774193545" data-spread-ratio="862.4058305176437" data-title="この2つの街の魅力は失われつつあります" data-channel="ブラックホール福岡 移住案内人">
+    <a href="https://www.youtube.com/watch?v=uvcub6gwZaw" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/uvcub6gwZaw/hqdefault.jpg" alt="この2つの街の魅力は失われつつあります" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=uvcub6gwZaw" target="_blank" rel="noopener" class="title">この2つの街の魅力は失われつつあります</a>
+      <div class="channel">ブラックホール福岡 移住案内人</div>
+      <div class="metrics">
+        <span class="metric"><b>82,936</b> 再生</span>
+        <span class="metric">登録者 <b>15,500</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>5.35</b></span>
+        <span class="metric">拡散比率 <b>862%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="81348" data-spread-rate="0.7328648648648649" data-spread-ratio="300.20579169791364" data-title="【日本地理】福岡で住みたすい駅TOP10【ゆっくり解説】" data-channel="日本地理おもしろ特捜部【ゆっくり解説】">
+    <a href="https://www.youtube.com/watch?v=6q8KF4pwZ0g" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/6q8KF4pwZ0g/hqdefault.jpg" alt="【日本地理】福岡で住みたすい駅TOP10【ゆっくり解説】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=6q8KF4pwZ0g" target="_blank" rel="noopener" class="title">【日本地理】福岡で住みたすい駅TOP10【ゆっくり解説】</a>
+      <div class="channel">日本地理おもしろ特捜部【ゆっくり解説】</div>
+      <div class="metrics">
+        <span class="metric"><b>81,348</b> 再生</span>
+        <span class="metric">登録者 <b>111,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.73</b></span>
+        <span class="metric">拡散比率 <b>300%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="77932" data-spread-rate="5.0278709677419355" data-spread-ratio="810.3719878448563" data-title="なぜか移住者に注目されないポテンシャルMAXの街を紹介します" data-channel="ブラックホール福岡 移住案内人">
+    <a href="https://www.youtube.com/watch?v=wLIIvZbBa78" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/wLIIvZbBa78/hqdefault.jpg" alt="なぜか移住者に注目されないポテンシャルMAXの街を紹介します" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=wLIIvZbBa78" target="_blank" rel="noopener" class="title">なぜか移住者に注目されないポテンシャルMAXの街を紹介します</a>
+      <div class="channel">ブラックホール福岡 移住案内人</div>
+      <div class="metrics">
+        <span class="metric"><b>77,932</b> 再生</span>
+        <span class="metric">登録者 <b>15,500</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>5.03</b></span>
+        <span class="metric">拡散比率 <b>810%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="73880" data-spread-rate="1.532780082987552" data-spread-ratio="422.8912246950658" data-title="【福岡vlog】九州移住最高すぎてもう東京戻れないよ！な１日🤣🎥" data-channel="ANNABABY LIFE">
+    <a href="https://www.youtube.com/watch?v=dp6YVwfhJZM" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/dp6YVwfhJZM/hqdefault.jpg" alt="【福岡vlog】九州移住最高すぎてもう東京戻れないよ！な１日🤣🎥" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=dp6YVwfhJZM" target="_blank" rel="noopener" class="title">【福岡vlog】九州移住最高すぎてもう東京戻れないよ！な１日🤣🎥</a>
+      <div class="channel">ANNABABY LIFE</div>
+      <div class="metrics">
+        <span class="metric"><b>73,880</b> 再生</span>
+        <span class="metric">登録者 <b>48,200</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>1.53</b></span>
+        <span class="metric">拡散比率 <b>423%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="71844" data-spread-rate="5.024055944055944" data-spread-ratio="779.4240805757656" data-title="【福岡移住希望者必見】福岡でおすすめの街｜住むならここ！｜福岡移住夫婦" data-channel="ちあき夫婦">
+    <a href="https://www.youtube.com/watch?v=2qttfGBBbsw" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/2qttfGBBbsw/hqdefault.jpg" alt="【福岡移住希望者必見】福岡でおすすめの街｜住むならここ！｜福岡移住夫婦" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=2qttfGBBbsw" target="_blank" rel="noopener" class="title">【福岡移住希望者必見】福岡でおすすめの街｜住むならここ！｜福岡移住夫婦</a>
+      <div class="channel">ちあき夫婦</div>
+      <div class="metrics">
+        <span class="metric"><b>71,844</b> 再生</span>
+        <span class="metric">登録者 <b>14,300</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>5.02</b></span>
+        <span class="metric">拡散比率 <b>779%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="68309" data-spread-rate="4.4070322580645165" data-spread-ratio="710.3077056625557" data-title="日本一のディスコ街はどうやって崩壊したのか｜AIが再現する当時の光景" data-channel="ブラックホール福岡 移住案内人">
+    <a href="https://www.youtube.com/watch?v=JbUZR5XTJc8" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/JbUZR5XTJc8/hqdefault.jpg" alt="日本一のディスコ街はどうやって崩壊したのか｜AIが再現する当時の光景" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=JbUZR5XTJc8" target="_blank" rel="noopener" class="title">日本一のディスコ街はどうやって崩壊したのか｜AIが再現する当時の光景</a>
+      <div class="channel">ブラックホール福岡 移住案内人</div>
+      <div class="metrics">
+        <span class="metric"><b>68,309</b> 再生</span>
+        <span class="metric">登録者 <b>15,500</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>4.41</b></span>
+        <span class="metric">拡散比率 <b>710%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="57687" data-spread-rate="0.14641370558375635" data-spread-ratio="109.30725302645554" data-title="【緊急】日本移住準備のために緊急来日！｜日帰り福岡｜アメリカから日本へ" data-channel="LocoYun /ろこゆん">
+    <a href="https://www.youtube.com/watch?v=2XwAP7njiBc" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/2XwAP7njiBc/hqdefault.jpg" alt="【緊急】日本移住準備のために緊急来日！｜日帰り福岡｜アメリカから日本へ" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=2XwAP7njiBc" target="_blank" rel="noopener" class="title">【緊急】日本移住準備のために緊急来日！｜日帰り福岡｜アメリカから日本へ</a>
+      <div class="channel">LocoYun /ろこゆん</div>
+      <div class="metrics">
+        <span class="metric"><b>57,687</b> 再生</span>
+        <span class="metric">登録者 <b>394,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.15</b></span>
+        <span class="metric">拡散比率 <b>109%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="57665" data-spread-rate="0.5014347826086957" data-spread-ratio="208.8787360390091" data-title="【リアル】福岡に移住して半年のアラサー夫婦が本音でぶっちゃけます。" data-channel="Like Saturday ライクサタデー">
+    <a href="https://www.youtube.com/watch?v=OV3z_OTuwWk" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/OV3z_OTuwWk/hqdefault.jpg" alt="【リアル】福岡に移住して半年のアラサー夫婦が本音でぶっちゃけます。" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=OV3z_OTuwWk" target="_blank" rel="noopener" class="title">【リアル】福岡に移住して半年のアラサー夫婦が本音でぶっちゃけます。</a>
+      <div class="channel">Like Saturday ライクサタデー</div>
+      <div class="metrics">
+        <span class="metric"><b>57,665</b> 再生</span>
+        <span class="metric">登録者 <b>115,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.5</b></span>
+        <span class="metric">拡散比率 <b>209%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="57530" data-spread-rate="3.7116129032258063" data-spread-ratio="598.2228155406583" data-title="入居希望者殺到！福岡郊外にあるマンションがヤバすぎる" data-channel="ブラックホール福岡 移住案内人">
+    <a href="https://www.youtube.com/watch?v=EjJhSZwU-Yo" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/EjJhSZwU-Yo/hqdefault.jpg" alt="入居希望者殺到！福岡郊外にあるマンションがヤバすぎる" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=EjJhSZwU-Yo" target="_blank" rel="noopener" class="title">入居希望者殺到！福岡郊外にあるマンションがヤバすぎる</a>
+      <div class="channel">ブラックホール福岡 移住案内人</div>
+      <div class="metrics">
+        <span class="metric"><b>57,530</b> 再生</span>
+        <span class="metric">登録者 <b>15,500</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>3.71</b></span>
+        <span class="metric">拡散比率 <b>598%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="54969" data-spread-rate="0.37141216216216216" data-spread-ratio="174.36016034956853" data-title="福岡県の住みやすい駅TOP10【地理ふしぎ】" data-channel="地理ふしぎ発見【ゆっくり解説】">
+    <a href="https://www.youtube.com/watch?v=7vixQWNUeRc" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/7vixQWNUeRc/hqdefault.jpg" alt="福岡県の住みやすい駅TOP10【地理ふしぎ】" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=7vixQWNUeRc" target="_blank" rel="noopener" class="title">福岡県の住みやすい駅TOP10【地理ふしぎ】</a>
+      <div class="channel">地理ふしぎ発見【ゆっくり解説】</div>
+      <div class="metrics">
+        <span class="metric"><b>54,969</b> 再生</span>
+        <span class="metric">登録者 <b>148,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.37</b></span>
+        <span class="metric">拡散比率 <b>174%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="53226" data-spread-rate="3.4339354838709677" data-spread-ratio="553.4678877101874" data-title="移住者に人気薄なエリア、雑餉隈。実際どうなの？" data-channel="ブラックホール福岡 移住案内人">
+    <a href="https://www.youtube.com/watch?v=aasEYUbA530" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/aasEYUbA530/hqdefault.jpg" alt="移住者に人気薄なエリア、雑餉隈。実際どうなの？" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=aasEYUbA530" target="_blank" rel="noopener" class="title">移住者に人気薄なエリア、雑餉隈。実際どうなの？</a>
+      <div class="channel">ブラックホール福岡 移住案内人</div>
+      <div class="metrics">
+        <span class="metric"><b>53,226</b> 再生</span>
+        <span class="metric">登録者 <b>15,500</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>3.43</b></span>
+        <span class="metric">拡散比率 <b>553%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="52801" data-spread-rate="0.4591391304347826" data-spread-ratio="191.2599695065589" data-title="【片道2000km】福岡→青森ねぶた祭り！ハイエースで地獄の大移動するアラサー夫婦" data-channel="Like Saturday ライクサタデー">
+    <a href="https://www.youtube.com/watch?v=346r5ZETFiU" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/346r5ZETFiU/hqdefault.jpg" alt="【片道2000km】福岡→青森ねぶた祭り！ハイエースで地獄の大移動するアラサー夫婦" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=346r5ZETFiU" target="_blank" rel="noopener" class="title">【片道2000km】福岡→青森ねぶた祭り！ハイエースで地獄の大移動するアラサー夫婦</a>
+      <div class="channel">Like Saturday ライクサタデー</div>
+      <div class="metrics">
+        <span class="metric"><b>52,801</b> 再生</span>
+        <span class="metric">登録者 <b>115,000</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>0.46</b></span>
+        <span class="metric">拡散比率 <b>191%</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-view-count="50974" data-spread-rate="3.2886451612903227" data-spread-ratio="530.0505788174781" data-title="年々アジア色が高まるディープタウンの意外な事実" data-channel="ブラックホール福岡 移住案内人">
+    <a href="https://www.youtube.com/watch?v=z7j3A0cgtyo" target="_blank" rel="noopener">
+      <img src="https://i.ytimg.com/vi/z7j3A0cgtyo/hqdefault.jpg" alt="年々アジア色が高まるディープタウンの意外な事実" loading="lazy" />
+    </a>
+    <div class="card-body">
+      <a href="https://www.youtube.com/watch?v=z7j3A0cgtyo" target="_blank" rel="noopener" class="title">年々アジア色が高まるディープタウンの意外な事実</a>
+      <div class="channel">ブラックホール福岡 移住案内人</div>
+      <div class="metrics">
+        <span class="metric"><b>50,974</b> 再生</span>
+        <span class="metric">登録者 <b>15,500</b></span>
+      </div>
+      <div class="metrics">
+        <span class="metric">拡散率 <b>3.29</b></span>
+        <span class="metric">拡散比率 <b>530%</b></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const grid = document.getElementById("grid");
+  const cards = Array.from(grid.children);
+  const countEl = document.getElementById("count");
+  const inputs = ["viewMin","viewMax","srMin","srMax","ratioMin","ratioMax","textSearch","sortBy"];
+
+  function getVal(id) { return document.getElementById(id).value; }
+  function getNum(id) { const v = getVal(id); return v === "" ? null : Number(v); }
+
+  function applyFilters() {
+    const viewMin = getNum("viewMin"), viewMax = getNum("viewMax");
+    const srMin = getNum("srMin"), srMax = getNum("srMax");
+    const ratioMin = getNum("ratioMin"), ratioMax = getNum("ratioMax");
+    const text = getVal("textSearch").toLowerCase();
+    const sortBy = getVal("sortBy");
+
+    let visible = 0;
+    cards.forEach(function(card) {
+      const vc = Number(card.dataset.viewCount);
+      const sr = Number(card.dataset.spreadRate);
+      const ratio = Number(card.dataset.spreadRatio);
+      const title = card.dataset.title.toLowerCase();
+      const channel = card.dataset.channel.toLowerCase();
+
+      let show = true;
+      if (viewMin !== null && vc < viewMin) show = false;
+      if (viewMax !== null && vc > viewMax) show = false;
+      if (srMin !== null && sr < srMin) show = false;
+      if (srMax !== null && sr > srMax) show = false;
+      if (ratioMin !== null && ratio < ratioMin) show = false;
+      if (ratioMax !== null && ratio > ratioMax) show = false;
+      if (text && !title.includes(text) && !channel.includes(text)) show = false;
+
+      card.classList.toggle("hidden", !show);
+      if (show) visible++;
+    });
+
+    cards.sort(function(a, b) {
+      return Number(b.dataset[sortBy]) - Number(a.dataset[sortBy]);
+    });
+    cards.forEach(function(card) { grid.appendChild(card); });
+
+    countEl.textContent = visible + " / " + cards.length + " 件表示";
+  }
+
+  inputs.forEach(function(id) {
+    var el = document.getElementById(id);
+    el.addEventListener("input", applyFilters);
+    el.addEventListener("change", applyFilters);
+  });
+
+  applyFilters();
+})();
+</script>
+</body>
+</html>

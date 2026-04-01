@@ -90,7 +90,7 @@ export const searchVideos = async ({
   maxResults?: number;
   videoDuration?: Duration;
   order?: SearchOrder;
-  publishedAfter?: Dayjs;
+  publishedAfter?: Dayjs | null;
 }): Promise<SearchVideosResult> => {
   const result = await youtube.search.list({
     part: ["snippet"],
