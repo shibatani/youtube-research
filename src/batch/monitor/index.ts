@@ -92,6 +92,7 @@ const loadChannelMonitorData = async () => {
     playlistItems,
     channelsMap: keyByMap(channels, ({ id }) => id!),
     videosMap: keyByMap(nonShortsVideos, ({ id }) => id!),
+    channelIdToAllPlaylistItemsMap: groupByMap(playlistItems, ({ snippet }) => snippet?.channelId!),
     channelIdToPlaylistItemsMap: groupByMap(
       nonShortsPlaylistItems,
       ({ snippet }) => snippet?.channelId!,
@@ -292,6 +293,28 @@ const main = async () => {
   }
 
   const monitorData = await loadChannelMonitorData();
+
+  // 直近1ヶ月投稿0件のチャンネルを非アクティブ化（Shorts含む全投稿で判定）
+  const inactiveChannels = monitorData.activeChannels.filter(
+    ({ channelId }) => !monitorData.channelIdToAllPlaylistItemsMap.has(channelId),
+  );
+  if (inactiveChannels.length > 0) {
+    await channel.bulkUpdateActiveStatus({
+      ids: inactiveChannels.map(({ id }) => id),
+      isActive: false,
+    });
+    const nameList = inactiveChannels.map(({ name }) => `• ${name}`).join("\n");
+    console.log(`直近1ヶ月投稿0件のため非アクティブ化: ${inactiveChannels.length}件`);
+    await notifySlack(
+      `[monitor] 直近1ヶ月投稿0件のため非アクティブ化: ${inactiveChannels.length}件\n${nameList}`,
+    );
+
+    // 非アクティブ化したチャンネルを監視対象から除外
+    const inactiveIds = new Set(inactiveChannels.map(({ id }) => id));
+    monitorData.activeChannels = monitorData.activeChannels.filter(
+      ({ id }) => !inactiveIds.has(id),
+    );
+  }
 
   console.log("指標計算中...");
   const { subscriberInserts, videoCountInserts, viewCountInserts, sheetRows } =

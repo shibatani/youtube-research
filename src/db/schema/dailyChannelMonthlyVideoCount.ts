@@ -25,13 +25,12 @@ export const dailyChannelMonthlyVideoCount = sqliteTable(
   (table) => [
     uniqueIndex("daily_channel_monthly_video_count_channel_date_idx").on(
       table.channelId,
-      table.businessDate
+      table.businessDate,
     ),
-  ]
+  ],
 );
 
 // 型エクスポート
-export type DailyChannelMonthlyVideoCount =
-  typeof dailyChannelMonthlyVideoCount.$inferSelect;
+export type DailyChannelMonthlyVideoCount = typeof dailyChannelMonthlyVideoCount.$inferSelect;
 export type DailyChannelMonthlyVideoCountInsertInput =
   typeof dailyChannelMonthlyVideoCount.$inferInsert;

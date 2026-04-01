@@ -10,9 +10,7 @@ import { eq, and, inArray } from "drizzle-orm";
 /**
  * 登録者数を一括登録
  */
-export const bulkInsert = async (
-  data: DailyChannelSubscriberCountInsertInput[]
-): Promise<void> => {
+export const bulkInsert = async (data: DailyChannelSubscriberCountInsertInput[]): Promise<void> => {
   if (data.length === 0) return;
   await db.insert(dailyChannelSubscriberCount).values(data);
 };
@@ -21,7 +19,7 @@ export const bulkInsert = async (
  * 特定日のデータを取得
  */
 export const getByDate = async (
-  businessDate: DateString
+  businessDate: DateString,
 ): Promise<DailyChannelSubscriberCount[]> => {
   return db
     .select()
@@ -33,7 +31,7 @@ export const getByDate = async (
  * 特定日のデータを1件取得（存在確認用）
  */
 export const getOneByDate = async (
-  businessDate: DateString
+  businessDate: DateString,
 ): Promise<DailyChannelSubscriberCount | null> => {
   const result = await db
     .select()
@@ -48,7 +46,7 @@ export const getOneByDate = async (
  */
 export const getByChannelIdsAndDate = async (
   channelIds: string[],
-  businessDate: DateString
+  businessDate: DateString,
 ): Promise<DailyChannelSubscriberCount[]> => {
   if (channelIds.length === 0) return [];
   return db
@@ -57,7 +55,7 @@ export const getByChannelIdsAndDate = async (
     .where(
       and(
         inArray(dailyChannelSubscriberCount.channelId, channelIds),
-        eq(dailyChannelSubscriberCount.businessDate, businessDate)
-      )
+        eq(dailyChannelSubscriberCount.businessDate, businessDate),
+      ),
     );
 };

@@ -11,7 +11,7 @@ import { eq, and, inArray } from "drizzle-orm";
  * 月間再生数を一括登録
  */
 export const bulkInsert = async (
-  data: DailyChannelMonthlyViewCountInsertInput[]
+  data: DailyChannelMonthlyViewCountInsertInput[],
 ): Promise<void> => {
   if (data.length === 0) return;
   await db.insert(dailyChannelMonthlyViewCount).values(data);
@@ -21,7 +21,7 @@ export const bulkInsert = async (
  * 特定日のデータを取得
  */
 export const getByDate = async (
-  businessDate: DateString
+  businessDate: DateString,
 ): Promise<DailyChannelMonthlyViewCount[]> => {
   return db
     .select()
@@ -34,7 +34,7 @@ export const getByDate = async (
  */
 export const getByChannelIdsAndDate = async (
   channelIds: string[],
-  businessDate: DateString
+  businessDate: DateString,
 ): Promise<DailyChannelMonthlyViewCount[]> => {
   if (channelIds.length === 0) return [];
   return db
@@ -43,7 +43,7 @@ export const getByChannelIdsAndDate = async (
     .where(
       and(
         inArray(dailyChannelMonthlyViewCount.channelId, channelIds),
-        eq(dailyChannelMonthlyViewCount.businessDate, businessDate)
-      )
+        eq(dailyChannelMonthlyViewCount.businessDate, businessDate),
+      ),
     );
 };

@@ -25,13 +25,12 @@ export const dailyChannelSubscriberCount = sqliteTable(
   (table) => [
     uniqueIndex("daily_channel_subscriber_count_channel_date_idx").on(
       table.channelId,
-      table.businessDate
+      table.businessDate,
     ),
-  ]
+  ],
 );
 
 // 型エクスポート
-export type DailyChannelSubscriberCount =
-  typeof dailyChannelSubscriberCount.$inferSelect;
+export type DailyChannelSubscriberCount = typeof dailyChannelSubscriberCount.$inferSelect;
 export type DailyChannelSubscriberCountInsertInput =
   typeof dailyChannelSubscriberCount.$inferInsert;

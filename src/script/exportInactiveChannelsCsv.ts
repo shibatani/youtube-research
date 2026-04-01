@@ -14,17 +14,13 @@ import { dateObjectToDateString } from "../lib/date-string";
 const OUTPUT_DIR = "./output";
 
 const main = async () => {
-  const inactiveChannels = await db
-    .select()
-    .from(channel)
-    .where(eq(channel.isActive, false));
+  const inactiveChannels = await db.select().from(channel).where(eq(channel.isActive, false));
 
   // CSVヘッダー
   const headers = ["チャンネル名", "チャンネルID", "説明文", "作成日時"];
 
   // CSVデータ行（説明文の改行・カンマ・ダブルクォートをエスケープ）
-  const escapeForCsv = (str: string): string =>
-    `"${str.replace(/"/g, '""').replace(/\n/g, " ")}"`;
+  const escapeForCsv = (str: string): string => `"${str.replace(/"/g, '""').replace(/\n/g, " ")}"`;
 
   const rows = inactiveChannels.map((ch) => [
     escapeForCsv(ch.name),

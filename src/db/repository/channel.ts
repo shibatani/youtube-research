@@ -19,14 +19,9 @@ export const getAll = async (): Promise<Channel[]> => {
 /**
  * YouTube channelId で存在するチャンネルを取得
  */
-export const getByChannelIds = async (
-  channelIds: string[]
-): Promise<Channel[]> => {
+export const getByChannelIds = async (channelIds: string[]): Promise<Channel[]> => {
   if (channelIds.length === 0) return [];
-  return db
-    .select()
-    .from(channel)
-    .where(inArray(channel.channelId, channelIds));
+  return db.select().from(channel).where(inArray(channel.channelId, channelIds));
 };
 
 /**
@@ -48,10 +43,7 @@ export const bulkUpdateActiveStatus = async ({
   isActive: boolean;
 }): Promise<void> => {
   if (ids.length === 0) return;
-  await db
-    .update(channel)
-    .set({ isActive })
-    .where(inArray(channel.id, ids));
+  await db.update(channel).set({ isActive }).where(inArray(channel.id, ids));
 };
 
 /**
@@ -70,9 +62,5 @@ export const bulkMarkAsNotStealth = async (ids: string[]): Promise<void> => {
  */
 export const bulkMarkAsStealth = async (ids: string[]): Promise<void> => {
   if (ids.length === 0) return;
-  await db
-    .update(channel)
-    .set({ isActive: true, isStealth: true })
-    .where(inArray(channel.id, ids));
+  await db.update(channel).set({ isActive: true, isStealth: true }).where(inArray(channel.id, ids));
 };
-
