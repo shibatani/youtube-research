@@ -16,7 +16,8 @@
     "batch:monitor": "tsx src/batch/monitor/index.ts",
     "batch:train": "tsx src/batch/train.ts",
     "batch:fukuoka-scout": "tsx src/batch/fukuoka-scout/index.ts",
-    "rival-analysis": "tsx src/scripts/rival-analysis.ts"
+    "rival:fetch": "tsx src/scripts/rival-fetch.ts",
+    "rival:apply": "tsx src/scripts/rival-apply.ts"
   },
   "keywords": [
     "youtube",
@@ -26,7 +27,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.88.0",
     "@libsql/client": "^0.15.15",
     "dayjs": "^1.11.19",
     "dotenv": "^16.3.1",
@@ -36,8 +36,7 @@
     "openai": "^6.15.0",
     "p-map": "^7.0.4",
     "rss-parser": "^3.13.0",
-    "uuid": "^13.0.0",
-    "xlsx": "^0.18.5"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.21",
